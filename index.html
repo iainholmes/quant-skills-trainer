@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quant Skills Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f4f2ed;
+  --surface: #ffffff;
+  --surface2: #f0ede6;
+  --border: #e0dcd3;
+  --border2: #ccc8be;
+  --text: #1a1916;
+  --text2: #5c584f;
+  --text3: #9c978e;
+  --mono: 'DM Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+  --py:    #2e7d32; --py-mid:    #4caf50; --py-light:    #e8f5e9; --py-border:    #a5d6a7;
+  --r:     #2e52c2; --r-mid:     #4a6fd4; --r-light:     #eaeefc; --r-border:     #a0b4ec;
+  --stata: #5b8fb9; --stata-mid: #7aafd4; --stata-light: #eef4fa; --stata-border: #b3cfe8;
+  --lang: var(--py); --lang-light: var(--py-light); --lang-border: var(--py-border);
+  --radius: 6px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; font-size: 15px; line-height: 1.65; }
+
+header { background: var(--surface); border-bottom: 1px solid var(--border); height: 54px; display: flex; align-items: center; justify-content: space-between; padding: 0 1.75rem; position: sticky; top: 0; z-index: 100; }
+.logo { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 0.06em; color: var(--text); display: flex; align-items: center; gap: 8px; text-transform: uppercase; }
+.logo-pip { width: 7px; height: 7px; border-radius: 50%; background: var(--py); transition: background 0.3s; }
+.header-right { display: flex; align-items: center; gap: 10px; }
+.api-badge { font-family: var(--mono); font-size: 10px; letter-spacing: 0.05em; padding: 3px 10px; border-radius: 20px; border: 1px solid var(--border2); color: var(--text3); display: flex; align-items: center; gap: 5px; text-transform: uppercase; }
+.api-badge .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--border2); transition: background 0.3s; }
+.api-badge.connected { border-color: var(--py-border); color: var(--py); }
+.api-badge.connected .dot { background: var(--py); }
+.btn-sm { font-family: var(--mono); font-size: 11px; padding: 5px 13px; border: 1px solid var(--border2); border-radius: var(--radius); background: transparent; color: var(--text2); cursor: pointer; letter-spacing: 0.02em; transition: all 0.14s; }
+.btn-sm:hover { background: var(--surface2); color: var(--text); }
+
+.overlay { position: fixed; inset: 0; background: rgba(20,18,14,0.55); display: flex; align-items: center; justify-content: center; z-index: 300; }
+.overlay.hidden { display: none; }
+.modal { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 2rem; width: 400px; max-width: calc(100vw - 2rem); box-shadow: 0 8px 40px rgba(0,0,0,0.12); }
+.modal h2 { font-family: var(--mono); font-size: 13px; font-weight: 500; letter-spacing: 0.04em; margin-bottom: 6px; }
+.modal p { font-size: 13px; color: var(--text2); margin-bottom: 1.25rem; }
+.modal input { width: 100%; font-family: var(--mono); font-size: 12px; padding: 9px 12px; border: 1px solid var(--border2); border-radius: var(--radius); background: var(--surface2); color: var(--text); outline: none; margin-bottom: 10px; }
+.modal input:focus { border-color: var(--lang); }
+.modal-row { display: flex; gap: 8px; align-items: center; }
+.btn-primary { font-family: var(--mono); font-size: 12px; font-weight: 500; padding: 8px 20px; background: var(--lang); color: #fff; border: none; border-radius: var(--radius); cursor: pointer; letter-spacing: 0.02em; transition: opacity 0.14s; }
+.btn-primary:hover { opacity: 0.86; }
+.modal-note { font-size: 11px; font-family: var(--mono); color: var(--text3); margin-top: 14px; line-height: 1.5; }
+.modal-note a { color: var(--lang); text-decoration: none; }
+
+.layout { display: grid; grid-template-columns: 272px 1fr; min-height: calc(100vh - 54px); }
+
+.sidebar { background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: sticky; top: 54px; height: calc(100vh - 54px); overflow: hidden; }
+.lang-tabs { display: grid; grid-template-columns: 1fr 1fr 1fr; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.lang-tab { padding: 10px 0; text-align: center; font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.05em; cursor: pointer; border: none; background: transparent; color: var(--text3); border-bottom: 2px solid transparent; transition: all 0.16s; text-transform: uppercase; }
+.lang-tab:hover { color: var(--text2); background: var(--surface2); }
+.lang-tab.active-py    { color: var(--py);    border-bottom-color: var(--py);    background: var(--py-light);    }
+.lang-tab.active-r     { color: var(--r);     border-bottom-color: var(--r);     background: var(--r-light);     }
+.lang-tab.active-stata { color: var(--stata); border-bottom-color: var(--stata); background: var(--stata-light); }
+
+.progress-strip { padding: 10px 16px 8px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.progress-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; color: var(--text3); text-transform: uppercase; margin-bottom: 6px; display: flex; justify-content: space-between; }
+.progress-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 3px; background: var(--lang); border-radius: 2px; transition: width 0.4s, background 0.3s; width: 0%; }
+
+.module-list { overflow-y: auto; flex: 1; padding: 0.5rem 0 1rem; }
+.tier-head { font-family: var(--mono); font-size: 9px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); padding: 12px 16px 4px; }
+.mod-item { display: flex; align-items: flex-start; gap: 10px; padding: 9px 16px; cursor: pointer; transition: background 0.12s; border-left: 2px solid transparent; }
+.mod-item:hover { background: var(--surface2); }
+.mod-item.active-py    { background: var(--py-light);    border-left-color: var(--py);    }
+.mod-item.active-r     { background: var(--r-light);     border-left-color: var(--r);     }
+.mod-item.active-stata { background: var(--stata-light); border-left-color: var(--stata); }
+.mod-indicator { width: 9px; height: 9px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; border: 1.5px solid var(--border2); background: transparent; transition: all 0.2s; }
+.mod-indicator.done    { background: var(--lang); border-color: var(--lang); }
+.mod-indicator.current { border-color: var(--lang); }
+.mod-text { flex: 1; min-width: 0; }
+.mod-name { font-size: 13px; color: var(--text); line-height: 1.35; }
+.mod-name.muted { color: var(--text2); }
+.mod-desc { font-size: 11px; color: var(--text3); font-family: var(--mono); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.main { padding: 2rem 2.25rem; max-width: 760px; }
+
+.welcome { display: block; }
+.welcome-title { font-family: var(--mono); font-size: 22px; font-weight: 300; color: var(--text); margin-bottom: 10px; letter-spacing: -0.01em; }
+.welcome-title span { color: var(--lang); transition: color 0.3s; }
+.welcome-sub { font-size: 14px; color: var(--text2); margin-bottom: 2rem; max-width: 480px; }
+.welcome-cards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 2rem; }
+.lang-card { padding: 1.25rem; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; transition: all 0.16s; }
+.lang-card:hover { border-color: var(--border2); transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.lang-card-py    { border-top: 3px solid var(--py);    }
+.lang-card-r     { border-top: 3px solid var(--r);     }
+.lang-card-stata { border-top: 3px solid var(--stata); }
+.lang-card-label { font-family: var(--mono); font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+.lang-card-py    .lang-card-label { color: var(--py);    }
+.lang-card-r     .lang-card-label { color: var(--r);     }
+.lang-card-stata .lang-card-label { color: var(--stata); }
+.lang-card-count { font-size: 12px; color: var(--text3); font-family: var(--mono); }
+.welcome-steps { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.5rem; }
+.welcome-steps h3 { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text3); margin-bottom: 12px; }
+.step-row { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 10px; font-size: 13px; color: var(--text2); }
+.step-row:last-child { margin-bottom: 0; }
+.step-num { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--lang); min-width: 18px; transition: color 0.3s; }
+
+.session { display: none; }
+.session.visible { display: block; }
+.sess-back { font-family: var(--mono); font-size: 11px; color: var(--text3); cursor: pointer; background: none; border: none; padding: 0; letter-spacing: 0.03em; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; transition: color 0.14s; }
+.sess-back:hover { color: var(--text2); }
+.sess-header { margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border); }
+.sess-title-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.sess-title { font-size: 18px; font-weight: 500; }
+.lang-pill { font-family: var(--mono); font-size: 10px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; }
+.pill-py    { background: var(--py-light);    color: var(--py);    border: 1px solid var(--py-border);    }
+.pill-r     { background: var(--r-light);     color: var(--r);     border: 1px solid var(--r-border);     }
+.pill-stata { background: var(--stata-light); color: var(--stata); border: 1px solid var(--stata-border); }
+.sess-desc { font-size: 13px; color: var(--text2); margin-top: 5px; font-family: var(--mono); }
+
+.phase-bar { display: flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 1.5rem; background: var(--surface); }
+.phase-btn { flex: 1; padding: 8px 0; font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; text-align: center; cursor: pointer; border: none; background: transparent; color: var(--text3); border-right: 1px solid var(--border); transition: all 0.14s; }
+.phase-btn:last-child { border-right: none; }
+.phase-btn:hover { background: var(--surface2); color: var(--text2); }
+.phase-btn.on-py    { background: var(--py-light);    color: var(--py);    }
+.phase-btn.on-r     { background: var(--r-light);     color: var(--r);     }
+.phase-btn.on-stata { background: var(--stata-light); color: var(--stata); }
+
+.phase-panel { display: none; }
+.phase-panel.visible { display: block; }
+
+.content-box { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.5rem; font-size: 14px; line-height: 1.8; color: var(--text); }
+.content-box h3 { font-size: 14px; font-weight: 500; margin: 1rem 0 0.4rem; }
+.content-box h3:first-child { margin-top: 0; }
+.content-box p { margin: 0.4rem 0; }
+.content-box ul { margin: 0.4rem 0 0.4rem 1.2rem; }
+.content-box li { margin: 0.25rem 0; }
+.content-box pre { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; font-family: var(--mono); font-size: 12px; overflow-x: auto; margin: 0.75rem 0; line-height: 1.6; white-space: pre; }
+.content-box code { font-family: var(--mono); font-size: 12px; background: var(--surface2); padding: 1px 5px; border-radius: 3px; }
+.content-box strong { font-weight: 500; }
+.content-box .watchout { background: #fffbf0; border: 1px solid #f5d87a; border-radius: var(--radius); padding: 0.75rem 1rem; margin-top: 0.75rem; font-size: 13px; }
+.content-box .watchout strong { color: #92700a; }
+
+.code-area { width: 100%; min-height: 180px; font-family: var(--mono); font-size: 12.5px; padding: 14px; border: 1px solid var(--border2); border-radius: 8px; background: #1e1e1e; color: #d4d4d4; resize: vertical; outline: none; line-height: 1.6; margin-bottom: 10px; margin-top: 1rem; }
+.code-area:focus { border-color: var(--lang); }
+.code-area::placeholder { color: #555; }
+.action-row { display: flex; gap: 8px; }
+.submit-btn { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 0.04em; padding: 8px 18px; border-radius: var(--radius); border: 1px solid var(--lang); background: var(--lang-light); color: var(--lang); cursor: pointer; transition: all 0.14s; display: inline-flex; align-items: center; gap: 7px; }
+.submit-btn:hover { background: var(--lang); color: #fff; }
+.submit-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.submit-btn:disabled:hover { background: var(--lang-light); color: var(--lang); }
+
+.ai-box { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.5rem; font-size: 14px; line-height: 1.75; color: var(--text); min-height: 80px; }
+.ai-box.empty { color: var(--text3); font-family: var(--mono); font-size: 12px; }
+.ai-box pre { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; font-family: var(--mono); font-size: 12px; overflow-x: auto; margin: 10px 0; line-height: 1.6; white-space: pre; }
+.ai-box code { font-family: var(--mono); font-size: 12px; background: var(--surface2); padding: 1px 5px; border-radius: 3px; }
+.ai-box strong { font-weight: 500; }
+.ai-box p { margin: 6px 0; }
+.ai-box h3 { font-size: 14px; font-weight: 500; margin: 12px 0 4px; }
+
+.done-btn { font-family: var(--mono); font-size: 12px; font-weight: 500; padding: 9px 20px; border-radius: var(--radius); border: none; background: var(--lang); color: #fff; cursor: pointer; letter-spacing: 0.03em; margin-top: 1.25rem; transition: opacity 0.14s; display: none; }
+.done-btn:hover { opacity: 0.86; }
+.done-btn.visible { display: inline-flex; align-items: center; gap: 7px; }
+
+.spin { display: inline-block; width: 12px; height: 12px; border: 1.5px solid rgba(255,255,255,0.35); border-top-color: currentColor; border-radius: 50%; animation: spin 0.65s linear infinite; vertical-align: middle; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.module-list::-webkit-scrollbar { width: 4px; }
+.module-list::-webkit-scrollbar-track { background: transparent; }
+.module-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-pip" id="logo-pip"></div>
+    Quant Skills Trainer
+  </div>
+  <div class="header-right">
+    <div class="api-badge" id="api-badge">
+      <div class="dot"></div>
+      <span id="api-label">No key</span>
+    </div>
+    <button class="btn-sm" onclick="openModal()">Set API key</button>
+  </div>
+</header>
+
+<div class="overlay hidden" id="modal-overlay">
+  <div class="modal">
+    <h2>Anthropic API Key</h2>
+    <p>Required only for code feedback. Stored in memory for this browser session — never logged or sent anywhere except Anthropic's API.</p>
+    <input type="password" id="api-key-input" placeholder="sk-ant-..." />
+    <div class="modal-row">
+      <button class="btn-primary" onclick="saveKey()">Save key</button>
+      <button class="btn-sm" onclick="closeModal()">Cancel</button>
+    </div>
+    <div class="modal-note">Get your key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> → API Keys.</div>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="lang-tabs">
+      <button class="lang-tab" id="tab-py"    onclick="switchLang('python')">Python</button>
+      <button class="lang-tab" id="tab-r"     onclick="switchLang('r')">R</button>
+      <button class="lang-tab" id="tab-stata" onclick="switchLang('stata')">Stata</button>
+    </div>
+    <div class="progress-strip">
+      <div class="progress-label">
+        <span>Progress</span>
+        <span id="prog-label">0 / 0</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="prog-fill"></div>
+      </div>
+    </div>
+    <div class="module-list" id="module-list"></div>
+  </aside>
+
+  <main class="main">
+    <div class="welcome" id="welcome">
+      <div class="welcome-title">Build your <span id="wt-lang">quant</span> foundation.</div>
+      <div class="welcome-sub">A structured curriculum for econometric modeling in Python, R, and Stata — from clean data to causal inference.</div>
+      <div class="welcome-cards">
+        <div class="lang-card lang-card-py"    onclick="switchLang('python')">
+          <div class="lang-card-label">Python</div>
+          <div class="lang-card-count">14 modules</div>
+        </div>
+        <div class="lang-card lang-card-r"     onclick="switchLang('r')">
+          <div class="lang-card-label">R</div>
+          <div class="lang-card-count">12 modules</div>
+        </div>
+        <div class="lang-card lang-card-stata" onclick="switchLang('stata')">
+          <div class="lang-card-label">Stata</div>
+          <div class="lang-card-count">11 modules</div>
+        </div>
+      </div>
+      <div class="welcome-steps">
+        <h3>How it works</h3>
+        <div class="step-row"><div class="step-num">01</div><div>Choose a language and select a module from the sidebar</div></div>
+        <div class="step-row"><div class="step-num">02</div><div>Read the lesson — concepts, worked code, and watch-outs</div></div>
+        <div class="step-row"><div class="step-num">03</div><div>Complete the exercise in your local editor (Jupyter, RStudio, Stata)</div></div>
+        <div class="step-row"><div class="step-num">04</div><div>Paste your code and submit for AI feedback, then mark it done</div></div>
+      </div>
+    </div>
+
+    <div class="session" id="session">
+      <div class="sess-header">
+        <button class="sess-back" onclick="goBack()">← back</button>
+        <div class="sess-title-row">
+          <div class="sess-title" id="sess-title"></div>
+          <span class="lang-pill" id="sess-pill"></span>
+        </div>
+        <div class="sess-desc" id="sess-desc"></div>
+      </div>
+
+      <div class="phase-bar">
+        <button class="phase-btn" id="pbtn-learn"    onclick="switchPhase('learn')">Learn</button>
+        <button class="phase-btn" id="pbtn-practice" onclick="switchPhase('practice')">Practice</button>
+        <button class="phase-btn" id="pbtn-feedback" onclick="switchPhase('feedback')">Feedback</button>
+      </div>
+
+      <div class="phase-panel visible" id="panel-learn">
+        <div class="content-box" id="learn-out"></div>
+      </div>
+
+      <div class="phase-panel" id="panel-practice">
+        <div class="content-box" id="exercise-out"></div>
+        <textarea class="code-area" id="code-input"
+          placeholder="Write your solution locally in Jupyter / RStudio / Stata, then paste your finished code here."></textarea>
+        <div class="action-row">
+          <button class="submit-btn" id="submit-btn" onclick="submitCode()">
+            <span id="submit-inner">Submit for review</span>
+          </button>
+          <button class="btn-sm" onclick="document.getElementById('code-input').value=''">Clear</button>
+        </div>
+      </div>
+
+      <div class="phase-panel" id="panel-feedback">
+        <div class="ai-box empty" id="feedback-out">Submit your code in the Practice tab to receive feedback here.</div>
+        <button class="done-btn" id="done-btn" onclick="markDone()">Mark complete ✓</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="curriculum.js"></script>
+<script>
+// ── State ─────────────────────────────────────────────────────────────────────
+let apiKey      = '';
+let currentLang = 'python';
+let currentMod  = null;
+let progress    = {};
+
+const PROG_KEY = 'qst_progress_v2';
+const LANG_KEY = 'qst_lang_v1';
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+function boot() {
+  try { progress = JSON.parse(localStorage.getItem(PROG_KEY) || '{}'); } catch(e) { progress = {}; }
+  const saved = localStorage.getItem(LANG_KEY);
+  if (saved && CURRICULUM[saved]) currentLang = saved;
+  applyLang(currentLang);
+  renderSidebar();
+}
+
+// ── Language ──────────────────────────────────────────────────────────────────
+function switchLang(lang) {
+  currentLang = lang;
+  localStorage.setItem(LANG_KEY, lang);
+  currentMod = null;
+  applyLang(lang);
+  showWelcome();
+  renderSidebar();
+}
+
+function applyLang(lang) {
+  const r = document.documentElement;
+  const map = {
+    python: ['var(--py)', 'var(--py-light)', 'var(--py-border)'],
+    r:      ['var(--r)',  'var(--r-light)',  'var(--r-border)'],
+    stata:  ['var(--stata)', 'var(--stata-light)', 'var(--stata-border)'],
+  };
+  const [l, ll, lb] = map[lang] || map.python;
+  r.style.setProperty('--lang', l);
+  r.style.setProperty('--lang-light', ll);
+  r.style.setProperty('--lang-border', lb);
+
+  // Tab active states
+  const ids = { python:'py', r:'r', stata:'stata' };
+  Object.entries(ids).forEach(([k,v]) => {
+    document.getElementById(`tab-${v}`).className =
+      'lang-tab' + (k === lang ? ` active-${v}` : '');
+  });
+
+  // Logo pip and welcome accent
+  const pip = document.getElementById('logo-pip');
+  if (pip) pip.style.background = lang === 'python' ? '#2e7d32' : lang === 'r' ? '#2e52c2' : '#5b8fb9';
+
+  const wl = document.getElementById('wt-lang');
+  if (wl) wl.textContent = lang === 'python' ? 'Python' : lang === 'r' ? 'R' : 'Stata';
+
+  // Step numbers accent
+  document.querySelectorAll('.step-num').forEach(el => {
+    el.style.color = lang === 'python' ? '#2e7d32' : lang === 'r' ? '#2e52c2' : '#5b8fb9';
+  });
+}
+
+// ── Sidebar ───────────────────────────────────────────────────────────────────
+function renderSidebar() {
+  const tiers = CURRICULUM[currentLang];
+  if (!tiers) return;
+
+  const allMods = tiers.flatMap(t => t.modules);
+  const done    = allMods.filter(m => progress[m.id]).length;
+  document.getElementById('prog-label').textContent = `${done} / ${allMods.length}`;
+  document.getElementById('prog-fill').style.width  = (allMods.length ? done / allMods.length * 100 : 0) + '%';
+
+  const suf  = currentLang === 'python' ? 'py' : currentLang === 'r' ? 'r' : 'stata';
+  const list = document.getElementById('module-list');
+  list.innerHTML = '';
+
+  tiers.forEach(tier => {
+    const h = document.createElement('div');
+    h.className = 'tier-head';
+    h.textContent = tier.tier;
+    list.appendChild(h);
+
+    tier.modules.forEach(mod => {
+      const isDone   = !!progress[mod.id];
+      const isActive = currentMod && currentMod.moduleId === mod.id;
+      const el = document.createElement('div');
+      el.className = 'mod-item' + (isActive ? ` active-${suf}` : '');
+      el.onclick = () => openModule(mod.id);
+
+      const dot = document.createElement('div');
+      dot.className = 'mod-indicator' + (isDone ? ' done' : (isActive ? ' current' : ''));
+
+      const txt = document.createElement('div');
+      txt.className = 'mod-text';
+      txt.innerHTML = `<div class="mod-name${isDone ? ' muted' : ''}">${mod.title}${isDone ? ' ✓' : ''}</div>
+                       <div class="mod-desc">${mod.desc}</div>`;
+
+      el.appendChild(dot);
+      el.appendChild(txt);
+      list.appendChild(el);
+    });
+  });
+}
+
+// ── Open module ───────────────────────────────────────────────────────────────
+function openModule(modId) {
+  const tiers = CURRICULUM[currentLang];
+  let mod = null;
+  for (const tier of tiers) {
+    mod = tier.modules.find(m => m.id === modId);
+    if (mod) break;
+  }
+  if (!mod) return;
+
+  currentMod = { moduleId: modId };
+
+  const suf  = currentLang === 'python' ? 'py' : currentLang === 'r' ? 'r' : 'stata';
+  const lbl  = currentLang === 'python' ? 'Python' : currentLang === 'r' ? 'R' : 'Stata';
+  document.getElementById('sess-title').textContent = mod.title;
+  document.getElementById('sess-desc').textContent  = mod.desc;
+  document.getElementById('sess-pill').className    = `lang-pill pill-${suf}`;
+  document.getElementById('sess-pill').textContent  = lbl;
+  document.getElementById('learn-out').innerHTML    = mod.lesson;
+  document.getElementById('exercise-out').innerHTML = mod.exercise;
+
+  const fb = document.getElementById('feedback-out');
+  fb.className = 'ai-box empty';
+  fb.textContent = 'Submit your code in the Practice tab to receive feedback here.';
+  document.getElementById('done-btn').className = 'done-btn';
+
+  switchPhase('learn');
+  showSession();
+  renderSidebar();
+}
+
+// ── Phase ─────────────────────────────────────────────────────────────────────
+function switchPhase(phase) {
+  const suf = currentLang === 'python' ? 'py' : currentLang === 'r' ? 'r' : 'stata';
+  ['learn','practice','feedback'].forEach(p => {
+    document.getElementById(`pbtn-${p}`).className =
+      'phase-btn' + (p === phase ? ` on-${suf}` : '');
+    document.getElementById(`panel-${p}`).className =
+      'phase-panel' + (p === phase ? ' visible' : '');
+  });
+}
+
+// ── Submit for AI review ──────────────────────────────────────────────────────
+async function submitCode() {
+  if (!apiKey) { openModal(); return; }
+  const code = document.getElementById('code-input').value.trim();
+  if (!code) { alert('Paste your code first.'); return; }
+
+  const tiers = CURRICULUM[currentLang];
+  let mod = null;
+  for (const tier of tiers) {
+    mod = tier.modules.find(m => m.id === currentMod.moduleId);
+    if (mod) break;
+  }
+
+  const langLabel   = currentLang === 'python' ? 'Python' : currentLang === 'r' ? 'R' : 'Stata';
+  const exerciseRaw = (mod ? mod.exercise : '').replace(/<[^>]+>/g, ' ').replace(/\s+/g,' ').trim();
+
+  const btn   = document.getElementById('submit-btn');
+  const inner = document.getElementById('submit-inner');
+  btn.disabled = true;
+  inner.innerHTML = '<span class="spin"></span> Reviewing…';
+
+  switchPhase('feedback');
+  const fb = document.getElementById('feedback-out');
+  fb.className   = 'ai-box empty';
+  fb.textContent = 'Analysing your code…';
+
+  const system = `You are a senior econometrician reviewing a student's code submission.
+Structure your feedback in three sections:
+1. **What's correct** — specific things done well
+2. **Issues & improvements** — concrete problems to fix (reference actual lines or functions)
+3. **Key insight** — the single most important thing to learn from this exercise
+
+Be direct and specific. Keep it to 250–350 words. The student is working in ${langLabel}.`;
+
+  const user = `Exercise:\n${exerciseRaw}\n\nStudent code:\n\`\`\`\n${code}\n\`\`\``;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system,
+        messages: [{ role: 'user', content: user }],
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '(empty response)';
+    fb.className = 'ai-box';
+    fb.innerHTML = md(text);
+    document.getElementById('done-btn').className = 'done-btn visible';
+
+  } catch(err) {
+    fb.className = 'ai-box';
+    fb.innerHTML = `<p style="color:#c0392b;font-family:var(--mono);font-size:12px;"><strong>Error:</strong> ${err.message}<br><br>Check your API key has available credits.</p>`;
+  } finally {
+    btn.disabled = false;
+    inner.textContent = 'Submit for review';
+  }
+}
+
+// ── Mark done ─────────────────────────────────────────────────────────────────
+function markDone() {
+  if (!currentMod) return;
+  progress[currentMod.moduleId] = true;
+  try { localStorage.setItem(PROG_KEY, JSON.stringify(progress)); } catch(e) {}
+  document.getElementById('done-btn').textContent = 'Marked complete ✓';
+  document.getElementById('done-btn').style.opacity = '0.6';
+  renderSidebar();
+}
+
+// ── View helpers ──────────────────────────────────────────────────────────────
+function showWelcome() {
+  document.getElementById('welcome').style.display = 'block';
+  document.getElementById('session').className = 'session';
+}
+function showSession() {
+  document.getElementById('welcome').style.display = 'none';
+  document.getElementById('session').className = 'session visible';
+}
+function goBack() {
+  currentMod = null;
+  showWelcome();
+  renderSidebar();
+}
+
+// ── Minimal markdown renderer ─────────────────────────────────────────────────
+function md(txt) {
+  return txt
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/```[\w]*\n([\s\S]*?)```/g, '<pre>$1</pre>')
+    .replace(/`([^`\n]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/^#{1,3} (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^\d+\. (.+)$/gm, '<p style="margin-left:1em;margin-top:4px">$1</p>')
+    .replace(/^[-•*] (.+)$/gm, '<p style="margin-left:1em;margin-top:4px">• $1</p>')
+    .replace(/\n\n+/g, '<br><br>')
+    .replace(/\n/g, '<br>');
+}
+
+// ── API key modal ─────────────────────────────────────────────────────────────
+function openModal() {
+  document.getElementById('modal-overlay').classList.remove('hidden');
+  setTimeout(() => document.getElementById('api-key-input').focus(), 50);
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.add('hidden');
+}
+function saveKey() {
+  const val = document.getElementById('api-key-input').value.trim();
+  if (!val) { closeModal(); return; }
+  apiKey = val;
+  const badge = document.getElementById('api-badge');
+  badge.className = 'api-badge connected';
+  document.getElementById('api-label').textContent = 'Key set';
+  closeModal();
+}
+document.getElementById('modal-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+document.getElementById('api-key-input').addEventListener('keydown', e => { if (e.key === 'Enter') saveKey(); });
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+boot();
+</script>
+</body>
+</html>
