@@ -1975,7 +1975,7 @@ reghdfe y treated#post, absorb(firm period) vce(cluster firm)
 
 * Event study: interact treated with period dummies
 forvalues p = 1/8 {
-  gen tp`p' = treated*(period==`p')
+  gen tp\`p' = treated*(period==\`p')
 }
 reghdfe y tp1-tp8, absorb(firm period) vce(cluster firm)
 * Period 4 is reference — check pre-period coefficients</pre>
