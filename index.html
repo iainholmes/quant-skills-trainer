@@ -59,7 +59,11 @@ header{background:var(--surface);border-bottom:1px solid var(--border);height:60
 .layout{display:grid;grid-template-columns:280px 1fr;flex:1;}
 
 /* Sidebar */
-.sidebar{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:60px;height:calc(100vh - 60px);overflow:hidden;}
+.sidebar{background:var(--surface);border-right:2px solid var(--lang);display:flex;flex-direction:column;position:sticky;top:60px;height:calc(100vh - 60px);overflow:hidden;box-shadow:inset -6px 0 16px rgba(0,0,0,0.045), 4px 0 12px rgba(0,0,0,0.04);transition:border-color 0.3s,box-shadow 0.3s;}
+/* Sidebar tint layer — language-aware */
+.sidebar::after{content:'';position:absolute;inset:0;pointer-events:none;background:var(--lang-light);opacity:0.18;transition:background 0.3s;}
+/* Main content panel — raised appearance */
+.main-col{background:var(--surface);box-shadow:-2px 0 20px rgba(0,0,0,0.06);position:relative;z-index:1;}
 .lang-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border);flex-shrink:0;}
 .lang-tab{padding:12px 0;text-align:center;font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:0.05em;cursor:pointer;border:none;background:transparent;color:var(--text3);border-bottom:2px solid transparent;transition:all 0.16s;text-transform:uppercase;}
 .lang-tab:hover{color:var(--text2);background:var(--surface2);}
@@ -68,11 +72,11 @@ header{background:var(--surface);border-bottom:1px solid var(--border);height:60
 .lang-tab.active-stata{color:var(--stata);border-bottom-color:var(--stata);background:var(--stata-light);}
 .progress-strip{padding:12px 20px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .progress-label{font-family:var(--mono);font-size:11px;letter-spacing:0.06em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;display:flex;justify-content:space-between;}
-.progress-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.progress-track{height:4px;background:var(--lang-light);border-radius:2px;overflow:hidden;}
 .progress-fill{height:4px;background:var(--lang);border-radius:2px;transition:width 0.4s,background 0.3s;width:0%;}
 
 /* Reset progress link */
-.reset-row{padding:8px 20px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:flex-end;}
+.reset-row{padding:8px 20px;border-bottom:1px solid var(--lang-border);flex-shrink:0;display:flex;align-items:center;justify-content:flex-end;background:var(--lang-light);opacity:0.9;}
 .reset-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.05em;text-transform:uppercase;color:var(--text3);background:none;border:none;cursor:pointer;padding:2px 0;transition:color 0.14s;}
 .reset-btn:hover{color:#ef4444;}
 
@@ -272,7 +276,7 @@ footer a:hover{color:var(--text2);}
     <div class="module-list" id="module-list"></div>
   </aside>
 
-  <div style="display:flex;flex-direction:column;min-height:calc(100vh - 60px);">
+  <div class="main-col" style="display:flex;flex-direction:column;min-height:calc(100vh - 60px);">
   <main class="main" style="flex:1;">
 
     <!-- Welcome -->
