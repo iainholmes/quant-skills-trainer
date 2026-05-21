@@ -8,6 +8,7 @@ const CURRICULUM = {
       {
         id: "py_env",
         title: "Environment & project setup",
+        concepts: ["venv isolates project dependencies and prevents version conflicts", "pip installs packages; requirements.txt locks versions for reproducibility", "Jupyter notebooks mix code, output, and narrative in one document", "Folder structure matters \u2014 separate raw data, scripts, and outputs"],
         desc: "venv, pip, Jupyter, folder layout",
         lesson: `<h3>Overview</h3>
 <p>A reproducible Python environment is the foundation of credible quantitative work. In consulting, your code must run identically on your machine, a colleague's machine, and months later — so environment discipline is non-negotiable.</p>
@@ -52,6 +53,7 @@ jupyter notebook</pre>
       {
         id: "py_types",
         title: "Data types, structures & functions",
+        concepts: ["Lists are mutable sequences; tuples are immutable; dicts map keys to values", "List comprehensions replace verbose loops with concise one-liners", "Functions encapsulate reusable logic and accept default arguments", "Python is dynamically typed \u2014 variables can change type at runtime"],
         desc: "lists, dicts, loops, comprehensions",
         lesson: `<h3>Overview</h3>
 <p>Before you touch a DataFrame, you need fluency in Python's core structures. Economic data manipulation — constructing instruments, reshaping panels, applying transformations — all reduces to list and dictionary operations under the hood.</p>
@@ -98,6 +100,7 @@ summarize(results, "GDP growth")</pre>
       {
         id: "py_numpy",
         title: "NumPy fundamentals",
+        concepts: ["Arrays are faster than lists for numerical computation due to vectorization", "Broadcasting allows operations between arrays of different shapes", "Linear algebra operations (dot product, matrix inverse) use np.linalg", "Avoid Python loops over arrays \u2014 use vectorized NumPy operations instead"],
         desc: "arrays, broadcasting, linear algebra",
         lesson: `<h3>Overview</h3>
 <p>NumPy is the computational backbone of Python's scientific stack. Econometric estimators — OLS, GLS, GMM — are matrix operations at their core. Understanding NumPy array mechanics makes you a much more effective user of statsmodels and linearmodels.</p>
@@ -143,6 +146,7 @@ n = 300</pre>
       {
         id: "py_pd1",
         title: "Pandas — loading & inspection",
+        concepts: ["DataFrames are 2D labeled structures; Series are 1D columns", "dtypes matter \u2014 object columns are slow; use category for string variables", "describe() gives distributional summary; info() gives memory and dtypes", "Always inspect shape, head, and missing values before any analysis"],
         desc: "DataFrames, dtypes, describe, missings",
         lesson: `<h3>Overview</h3>
 <p>Before running a single regression, you must understand your dataset's structure, coverage, and quirks. Skipping this step is the most common source of incorrect empirical results.</p>
@@ -202,6 +206,7 @@ df["med_income"] = df["med_income"].astype(str)  # intentionally broken</pre>
       {
         id: "py_pd2",
         title: "Pandas — cleaning & reshaping",
+        concepts: ["merge() joins DataFrames on keys \u2014 always verify row counts after joining", "melt() converts wide to long format; pivot_table() does the reverse", "groupby() + agg() computes group-level statistics efficiently", "Missing values propagate silently \u2014 always check for NaN after operations"],
         desc: "merge, melt, pivot, groupby",
         lesson: `<h3>Overview</h3>
 <p>In consulting, raw data is almost never analysis-ready. You'll spend the majority of your time cleaning: handling missings, merging datasets, constructing variables, and reshaping between wide and long formats.</p>
@@ -272,6 +277,7 @@ meta = pd.DataFrame({
       {
         id: "py_ols",
         title: "OLS regression with statsmodels",
+        concepts: ["statsmodels formula API uses R-style formulas: 'y ~ x1 + x2'", "Robust standard errors (HC3) correct for heteroskedasticity", "OLS assumes linearity, exogeneity, homoskedasticity, and no multicollinearity", "Always check R-squared alongside coefficient significance and signs"],
         desc: "formula API, robust SEs, interpretation",
         lesson: `<h3>Overview</h3>
 <p>OLS is the workhorse of applied econometrics. Before reaching for IV or panel methods, you should be completely fluent with OLS specification, estimation, and output interpretation in Python.</p>
@@ -332,6 +338,7 @@ df["lwage"] = (0.8 + 0.11*df["educ"] + 0.04*df["exper"]
       {
         id: "py_diag",
         title: "Regression diagnostics",
+        concepts: ["Breusch-Pagan test detects heteroskedasticity in residuals", "VIF above 10 signals severe multicollinearity between regressors", "Residual plots should show no pattern \u2014 any structure indicates misspecification", "Outliers and leverage points can dominate OLS estimates"],
         desc: "heteroskedasticity, multicollinearity, specification tests",
         lesson: `<h3>Overview</h3>
 <p>Running a regression is easy. Knowing whether you can trust the results requires diagnostics. In consulting, a deliverable that fails basic specification checks is a credibility risk.</p>
@@ -410,6 +417,7 @@ df["lwage"] = (1.0 + 0.10*df["educ"] + 0.02*df["exper"]
       {
         id: "py_iv",
         title: "Instrumental variables",
+        concepts: ["IV requires relevance (strong first stage) and exclusion restriction (valid instrument)", "First-stage F-statistic below 10 signals a weak instrument", "2SLS estimates the LATE \u2014 the effect for compliers only", "IV standard errors are larger than OLS \u2014 this is expected, not a mistake"],
         desc: "2SLS, weak instrument tests, linearmodels",
         lesson: `<h3>Overview</h3>
 <p>IV estimation addresses endogeneity — when a regressor is correlated with the error term, OLS is biased. Classic applications in economics include using distance to college as an instrument for education (Card 1995) or rainfall as an instrument for income in conflict studies.</p>
@@ -472,6 +480,7 @@ df["const"] = 1</pre>
       {
         id: "py_panel",
         title: "Panel data & fixed effects",
+        concepts: ["Fixed effects remove all time-invariant unobserved heterogeneity", "Random effects are efficient but require strict exogeneity of all regressors", "Cluster standard errors at the unit level to account for serial correlation", "Within-estimator uses only variation over time within each unit"],
         desc: "entity/time FE, within estimator, linearmodels",
         lesson: `<h3>Overview</h3>
 <p>Panel data — multiple observations per unit over time — is extremely common in applied economics. Fixed effects estimation controls for all time-invariant unobserved heterogeneity across units, which is one of the most powerful identification strategies available without an experiment.</p>
@@ -536,6 +545,7 @@ df["teen_emp"] = (30 - 0.8*df["min_wage"] + df["state_fe"]
       {
         id: "py_ts",
         title: "Time series analysis",
+        concepts: ["Stationarity is required for valid inference \u2014 test with ADF or KPSS", "ARIMA(p,d,q): p=AR lags, d=differences, q=MA lags", "VAR models capture dynamic interdependencies between multiple series", "Always check residual autocorrelation with Ljung-Box after fitting"],
         desc: "stationarity, ARIMA, autocorrelation",
         lesson: `<h3>Overview</h3>
 <p>Time series data requires special treatment because observations are ordered and correlated in time. Regressing non-stationary series on each other produces spurious results — a notorious trap in macroeconomic analysis.</p>
@@ -594,6 +604,7 @@ gdp_growth = np.diff(gdp_level) / gdp_level[:-1] * 100</pre>
       {
         id: "py_did",
         title: "Difference-in-differences",
+        concepts: ["DiD identifies causal effects using pre/post and treated/control variation", "Parallel trends assumption: treated and control would have moved together absent treatment", "Staggered adoption requires Callaway-Sant'Anna or Sun-Abraham, not TWFE", "Event study plots visualize pre-trends and dynamic treatment effects"],
         desc: "parallel trends, event study, TWFE",
         lesson: `<h3>Overview</h3>
 <p>DiD is the most widely used quasi-experimental method in applied economics. It compares the change in outcomes for a treated group relative to a control group across a policy change. Clean DiD requires the parallel trends assumption.</p>
@@ -661,6 +672,7 @@ df["emp"] = (50 + 2*df["period"] + df["state_fe"]
       {
         id: "py_rd",
         title: "Regression discontinuity",
+        concepts: ["RD exploits a discontinuity at a known threshold to identify causal effects", "Bandwidth selection trades off bias (wide) vs variance (narrow)", "Always test for manipulation at the cutoff using density tests (McCrary)", "Local linear regression is preferred over polynomials for RD estimation"],
         desc: "sharp RD, bandwidth, McCrary density test",
         lesson: `<h3>Overview</h3>
 <p>RD design exploits a threshold rule that assigns treatment based on whether a running variable crosses a cutoff. Near the cutoff, treated and untreated units are nearly identical — providing quasi-random variation in treatment.</p>
@@ -718,6 +730,7 @@ df["gpa_c"] = df["gpa"] - 3.0   # center at cutoff</pre>
       {
         id: "py_ml",
         title: "Machine learning for causal inference",
+        concepts: ["LASSO shrinks coefficients to zero for variable selection in high dimensions", "Double ML separates variable selection from causal estimation to remove bias", "Causal forests estimate heterogeneous treatment effects across subgroups", "Cross-fitting prevents overfitting from contaminating causal estimates"],
         desc: "LASSO, double ML, partialling out",
         lesson: `<h3>Overview</h3>
 <p>Modern econometrics increasingly incorporates ML tools — not for prediction per se, but for controlling high-dimensional confounders while preserving valid inference. The key is combining ML's flexibility with econometric discipline around standard errors and causal interpretation.</p>
@@ -779,6 +792,7 @@ lwage = (1.5 + 0.20*d + X @ beta_x * 0.5
       {
         id: "glm_bridge",
         title: "GLM Bridge — Logit, Poisson & Tobit",
+        concepts: ["OLS is inconsistent for binary, count, and censored outcomes", "Logit models log-odds; always report Average Marginal Effects, not raw coefficients", "Poisson assumes mean equals variance \u2014 test for overdispersion before using", "Tobit models the latent continuous variable when outcomes are censored at a limit"],
         desc: "Binary, count, and censored outcomes — when OLS breaks down",
         lesson: `<h3>Overview</h3><p>OLS assumes a continuous unbounded dependent variable. When your outcome is binary (0/1), a count (0,1,2...), or censored, OLS produces biased estimates. The fix is a Generalized Linear Model (GLM) matched to your data-generating process.</p><h3>The Three Core Cases</h3><p><strong>Binary (Logit/Probit):</strong> y in {0,1}. Report Average Marginal Effects (AMEs) — raw coefficients are log-odds and uninterpretable as effects.</p><p><strong>Count (Poisson/NB):</strong> y = 0,1,2... Poisson assumes mean = variance. If overdispersed, use Negative Binomial. PPML is the workhorse for trade models.</p><p><strong>Censored (Tobit):</strong> y observed only above/below a threshold (e.g. WTP, hours worked). Models the latent continuous variable.</p><h3>R (fixest + marginaleffects)</h3><pre><code>library(fixest); library(marginaleffects)
 # Logit
@@ -805,6 +819,7 @@ tobit y_cens x1 x2, ll(0)</code></pre><div class="watchout"><strong>Watch out:</
       ,{
         id: "py_viz",
         title: "Research visualization",
+        concepts: ["Publication figures require axis labels, titles, and consistent styling", "ggplot-style grammar: data + aesthetics + geometry + theme", "Always export at high resolution (300 DPI) for journal submission", "Color choices should be colorblind-safe \u2014 use viridis or ColorBrewer palettes"],
         desc: "coefficient plots, event studies, publication figures",
         lesson: `<h3>Overview</h3>
 <p>In consulting and academic work, visualizations are how your empirical findings get communicated and remembered. A well-designed coefficient plot conveys more than a regression table. Publication-quality figures are a professional differentiator.</p>
@@ -863,6 +878,7 @@ ses   = [0.12]*4 + [0.0] + [0.15]*4  # period -1 is reference (se=0)</pre>
       {
         id: "r_env",
         title: "Environment & project setup",
+        concepts: ["renv locks package versions for reproducible research environments", "RStudio projects keep working directories consistent across machines", "here() builds file paths relative to the project root \u2014 never use setwd()", "R scripts should be self-contained and runnable from top to bottom"],
         desc: "renv, here, RStudio projects",
         lesson: `<h3>Overview</h3>
 <p>Reproducible R work requires disciplined project management. Unlike Python, where venv is standard, R's package management has historically been fragmented — <code>renv</code> is now the gold standard for lockfiles and reproducibility.</p>
@@ -905,6 +921,7 @@ df <- read.csv(data_path)</pre>
       {
         id: "r_base",
         title: "Base R & data structures",
+        concepts: ["Vectors are R's fundamental data structure \u2014 all elements must be the same type", "Lists can hold mixed types including other lists and data frames", "Apply family (lapply, sapply, vapply) replaces loops over lists and vectors", "Factor variables store categorical data efficiently with defined levels"],
         desc: "vectors, lists, functions, apply",
         lesson: `<h3>Overview</h3>
 <p>Fluency in base R makes you much more effective with tidyverse and econometric packages — most function outputs are base R lists and vectors. Understanding these structures is essential for extracting regression results programmatically.</p>
@@ -953,6 +970,7 @@ region <- sample(c("NE","MW","S","W"), n, replace=TRUE)</pre>
       {
         id: "r_tidy",
         title: "Tidyverse data manipulation",
+        concepts: ["dplyr verbs: select, filter, mutate, summarise, arrange, group_by", "The pipe operator (%>% or |>) chains operations for readable code", "tidyr's pivot_longer and pivot_wider reshape data between formats", "joins in dplyr follow SQL conventions \u2014 always verify row counts after joining"],
         desc: "dplyr, tidyr, pipes, joins",
         lesson: `<h3>Overview</h3>
 <p>The tidyverse is the dominant data manipulation framework in R for a reason — readable, composable, and consistent. In economic research, you'll use dplyr for summarizing and transforming data, and tidyr for reshaping panels.</p>
@@ -1014,6 +1032,7 @@ emp_df$unemp[sample(n, 25)] <- NA</pre>
       {
         id: "r_clean",
         title: "Data cleaning & variable construction",
+        concepts: ["forcats handles factor recoding and level reordering", "case_when() is cleaner than nested ifelse() for multiple conditions", "Outlier detection should precede modeling \u2014 winsorize or flag, don't silently drop", "Variable construction should be documented with comments explaining each decision"],
         desc: "recoding, factors, outliers, janitor",
         lesson: `<h3>Overview</h3>
 <p>Raw economic data is messy. Wages coded as character strings, categories with inconsistent capitalization, and outliers that are data entry errors rather than real observations — all require careful handling before any analysis.</p>
@@ -1081,6 +1100,7 @@ raw <- tibble(
       {
         id: "r_vizbasics",
         title: "Data visualization with ggplot2",
+        concepts: ["ggplot2 builds plots layer by layer: data + aes() + geom + theme", "aes() maps variables to visual properties (x, y, color, size, shape)", "facet_wrap() and facet_grid() create small multiples for comparison", "theme_minimal() or theme_bw() are cleaner starting points than the default"],
         desc: "geoms, aesthetics, facets, themes",
         lesson: `<h3>Overview</h3>
 <p>ggplot2 is the dominant visualization library in R and one of the most influential data visualization tools in any language. Before producing publication figures, you need fluency in the grammar of graphics — how layers, aesthetics, and scales compose into a complete plot.</p>
@@ -1145,6 +1165,7 @@ df <- tibble(
       {
         id: "r_ols",
         title: "OLS with fixest & modelsummary",
+        concepts: ["feols() from fixest is faster than lm() and handles FE natively", "SE = 'hetero' gives HC1 robust SEs; cluster = ~id gives clustered SEs", "modelsummary() produces publication-ready regression tables in one line", "Always report robust or clustered SEs in applied econometrics \u2014 never default SEs"],
         desc: "feols, robust/clustered SEs, output tables",
         lesson: `<h3>Overview</h3>
 <p>The <code>fixest</code> package has become the standard for OLS and FE estimation in R — it's dramatically faster than <code>lm</code> for large datasets and has native support for robust and clustered SEs. <code>modelsummary</code> produces publication-quality regression tables.</p>
@@ -1207,6 +1228,7 @@ df$lwage <- with(df, 0.8 + 0.11*educ + 0.04*exper - 0.0006*exper2
       {
         id: "r_diag",
         title: "Regression diagnostics in R",
+        concepts: ["plot(model) produces four key diagnostic plots \u2014 check all four", "car::vif() computes VIF; values above 10 indicate severe multicollinearity", "lmtest::bgtest() tests for serial correlation in residuals", "Influential observations identified by Cook's distance should be investigated"],
         desc: "heteroskedasticity, VIF, specification tests",
         lesson: `<h3>Overview</h3>
 <p>After estimating a model, diagnostic checking validates your assumptions. R has excellent diagnostic tools through <code>lmtest</code>, <code>car</code>, and base R's <code>plot.lm</code>.</p>
@@ -1261,6 +1283,7 @@ df <- data.frame(lwage, educ, exper)</pre>
       {
         id: "r_iv",
         title: "Instrumental variables with fixest",
+        concepts: ["feols with | FE | endog ~ instrument implements IV with fixed effects", "fitstat(model, 'ivf') extracts the first-stage F-statistic", "Sargan-Hansen test checks overidentification when instruments exceed endogenous regressors", "Control function approach: add first-stage residual as regressor in second stage"],
         desc: "feols IV syntax, first stage, Sargan test",
         lesson: `<h3>Overview</h3>
 <p>IV estimation in R is elegantly handled by <code>fixest::feols</code> using a pipe-separated formula syntax. This integrates seamlessly with fixed effects and clustered standard errors.</p>
@@ -1314,6 +1337,7 @@ df <- data.frame(lwage, educ, proximity, state)</pre>
       {
         id: "r_panel",
         title: "Panel data & fixed effects",
+        concepts: ["plm() and fixest handle panel data with unit and time fixed effects", "TWFE absorbs all unit and time level variation \u2014 only within variation remains", "Clustered SEs at the panel unit level correct for within-unit serial correlation", "Hausman test compares FE and RE \u2014 rejection means RE is inconsistent"],
         desc: "TWFE with fixest, clustered SEs",
         lesson: `<h3>Overview</h3>
 <p>R's <code>fixest</code> package is among the fastest implementations of high-dimensional fixed effects in any statistical software. It handles two-way FE with clustered SEs — the standard specification in applied panel econometrics — efficiently and with excellent output.</p>
@@ -1375,6 +1399,7 @@ df$investment <- 20 - 0.8*df$tax_rate + df$firm_fe + rnorm(N, 0, 2)</pre>
       {
         id: "r_ts",
         title: "Time series in R",
+        concepts: ["ts() creates time series objects; index must be regular and complete", "auto.arima() selects ARIMA orders by AIC \u2014 always validate with residual checks", "forecast package provides point and interval predictions with plot methods", "Cointegration (Engle-Granger, Johansen) tests for long-run equilibrium relationships"],
         desc: "ts objects, ADF, ARIMA, fpp3",
         lesson: `<h3>Overview</h3>
 <p>R has excellent time series support through the base <code>ts</code> class, <code>tseries</code> for unit root tests, and the <code>fpp3</code> ecosystem (Hyndman) for modern tidy time series analysis.</p>
@@ -1430,6 +1455,7 @@ ts_growth <- ts(gdp_growth, start=c(2005,2), frequency=4)</pre>
       {
         id: "r_did",
         title: "Difference-in-differences in R",
+        concepts: ["att_gt() from did package implements Callaway-Sant'Anna for staggered DiD", "aggte() aggregates group-time ATTs into overall, dynamic, or group effects", "Pre-trend tests should show flat coefficients before treatment \u2014 visualize with event study", "Never use TWFE with staggered treatment \u2014 it produces biased estimates under heterogeneity"],
         desc: "TWFE, Sun-Abraham, Callaway-Sant'Anna",
         lesson: `<h3>Overview</h3>
 <p>R has become the leading environment for modern DiD methods. The <code>did</code> package implements Callaway-Sant'Anna (2021), which handles staggered treatment adoption without TWFE's bias. fixest's <code>sunab()</code> implements Sun-Abraham (2021).</p>
@@ -1484,6 +1510,7 @@ panel$y <- (10 + 0.5*panel$t + panel$state_fe
       {
         id: "r_rd",
         title: "Regression discontinuity in R",
+        concepts: ["rdrobust() implements local linear RD with MSE-optimal bandwidth selection", "rddensity() tests for sorting/manipulation at the cutoff", "rdplot() visualizes the discontinuity with binned means and confidence bands", "Always test covariate balance at the cutoff \u2014 discontinuities in covariates signal violation"],
         desc: "rdrobust, rddensity, rdplot",
         lesson: `<h3>Overview</h3>
 <p>The <code>rdrobust</code> package provides state-of-the-art RD estimation in R — optimal bandwidth selection (CCT), bias-corrected estimates, and robust confidence intervals. It's the standard tool for applied RD work.</p>
@@ -1538,6 +1565,7 @@ child_dev <- (60 - 0.3*(poverty_rate - 59.2) + 5*eligible
       {
         id: "glm_bridge",
         title: "GLM Bridge — Logit, Poisson & Tobit",
+        concepts: ["OLS is inconsistent for binary, count, and censored outcomes", "Logit models log-odds; always report Average Marginal Effects, not raw coefficients", "Poisson assumes mean equals variance \u2014 test for overdispersion before using", "Tobit models the latent continuous variable when outcomes are censored at a limit"],
         desc: "Binary, count, and censored outcomes — when OLS breaks down",
         lesson: `<h3>Overview</h3><p>OLS assumes a continuous unbounded dependent variable. When your outcome is binary (0/1), a count (0,1,2...), or censored, OLS produces biased estimates. The fix is a Generalized Linear Model (GLM) matched to your data-generating process.</p><h3>The Three Core Cases</h3><p><strong>Binary (Logit/Probit):</strong> y in {0,1}. Report Average Marginal Effects (AMEs) — raw coefficients are log-odds and uninterpretable as effects.</p><p><strong>Count (Poisson/NB):</strong> y = 0,1,2... Poisson assumes mean = variance. If overdispersed, use Negative Binomial. PPML is the workhorse for trade models.</p><p><strong>Censored (Tobit):</strong> y observed only above/below a threshold (e.g. WTP, hours worked). Models the latent continuous variable.</p><h3>R (fixest + marginaleffects)</h3><pre><code>library(fixest); library(marginaleffects)
 # Logit
@@ -1564,6 +1592,7 @@ tobit y_cens x1 x2, ll(0)</code></pre><div class="watchout"><strong>Watch out:</
       ,{
         id: "r_viz",
         title: "Publication visualization with ggplot2",
+        concepts: ["ggsave() exports at controlled resolution \u2014 use width, height, dpi arguments", "scales package formats axes: scale_y_continuous(labels = scales::comma)", "patchwork combines multiple ggplot objects into publication layouts", "Coefficient plots from modelsummary or ggcoef are cleaner than regression tables"],
         desc: "ggplot themes, coefficient plots, saving",
         lesson: `<h3>Overview</h3>
 <p>ggplot2 is the gold standard for statistical visualization in R. Publication-quality figures for journals and consulting reports require attention to typography, color, axes, and layout. The <code>modelsummary</code> ecosystem integrates well for model plots.</p>
@@ -1634,6 +1663,7 @@ m_es <- feols(y ~ treated:i(t, ref=4) | id + t, panel, cluster=~id)</pre>
       {
         id: "st_env",
         title: "Stata environment & workflow",
+        concepts: ["do-files are Stata's scripts \u2014 always work from do-files, never interactively", "log using opens a log file that records all output for reproducibility", "global and local macros store file paths and variable lists for reuse", "Version control: save do-files with version numbers and comment changes"],
         desc: "do-files, log files, directory setup",
         lesson: `<h3>Overview</h3>
 <p>Stata's strength is its integration of analysis and documentation. A disciplined Stata workflow — with do-files, log files, and a clean directory structure — produces fully reproducible work that others can verify and extend.</p>
@@ -1679,6 +1709,7 @@ log close</pre>
       {
         id: "st_import",
         title: "Importing & inspecting data",
+        concepts: ["import delimited loads CSV; use delimiters and varnames options carefully", "describe shows variable types and labels; codebook gives full summary statistics", "Always check N after merge \u2014 unexpected drops signal key mismatches", "labelbook documents value labels \u2014 essential for categorical variables"],
         desc: "import delimited, use, codebook, describe",
         lesson: `<h3>Overview</h3>
 <p>Stata can read most data formats directly. Before any analysis, always inspect your data systematically — variable types, missings, distributions, and plausibility checks. Stata's codebook and tabulate commands make this fast.</p>
@@ -1737,6 +1768,7 @@ replace unemp_rate = . if runiform() < 0.075</pre>
       {
         id: "st_clean",
         title: "Data cleaning in Stata",
+        concepts: ["replace with if conditions performs targeted recoding of specific values", "egen creates new variables from row or group operations", "duplicates report identifies duplicate observations before analysis", "encode converts string variables to numeric with value labels"],
         desc: "replace, recode, egen, reshape",
         lesson: `<h3>Overview</h3>
 <p>Stata's data cleaning commands are concise and powerful. The combination of <code>generate</code>, <code>replace</code>, <code>recode</code>, and <code>egen</code> handles most cleaning tasks without loops. Reshaping between wide and long is essential for panel work.</p>
@@ -1794,6 +1826,7 @@ gen female    = rbinomial(1, 0.5)</pre>
       {
         id: "st_datatypes",
         title: "Data types & variable management",
+        concepts: ["byte, int, long, float, double \u2014 store variables in the smallest type that fits", "String variables (str#) are fixed width \u2014 strL handles long strings", "tostring and destring convert between numeric and string", "compress reduces dataset size by storing variables in optimal types"],
         desc: "numeric, string, dates, label systems",
         lesson: `<h3>Overview</h3>
 <p>Stata has a strict and expressive type system. Understanding variable storage types, label systems, and date handling prevents subtle errors common when working with administrative datasets, survey microdata, and panel files from official statistical agencies.</p>
@@ -1852,6 +1885,7 @@ gen tenure    = (mdy(6,1,2023) - hire_date)/365</pre>
       {
         id: "st_macros",
         title: "Macros, loops & program flow",
+        concepts: ["local macros are temporary; global macros persist across do-files", "forvalues and foreach loops iterate over numbers and lists respectively", "Macros in Stata use backtick-apostrophe syntax: `macroname'", "capture quietly suppresses output and errors for conditional execution"],
         desc: "local, global, forvalues, foreach, if/else",
         lesson: `<h3>Overview</h3>
 <p>Stata's macro and loop system separates manual click-through analysis from scalable, reproducible code. Consulting projects routinely require the same model across 20 subgroups, 10 outcomes, or 5 specifications — macros and loops make this maintainable.</p>
@@ -1918,6 +1952,7 @@ gen lwage = log(wage)</pre>
       {
         id: "st_ols",
         title: "OLS regression in Stata",
+        concepts: ["regress y x1 x2, robust gives HC1 heteroskedasticity-robust SEs", "vce(cluster id) clusters standard errors at the specified level", "eststo and esttab produce formatted regression tables for export", "test performs post-estimation hypothesis tests on linear combinations"],
         desc: "regress, robust, outreg2, coefplot",
         lesson: `<h3>Overview</h3>
 <p>Stata's <code>regress</code> command is the foundation of empirical work. It integrates cleanly with robust and clustered standard errors, and with output tools like <code>outreg2</code> and <code>estout</code> for publication tables.</p>
@@ -1974,6 +2009,7 @@ gen lwage = 0.8 + 0.11*educ + 0.04*exper - 0.0005*exper2 ///
       {
         id: "st_diag",
         title: "Regression diagnostics in Stata",
+        concepts: ["estat hettest performs Breusch-Pagan test for heteroskedasticity", "estat vif computes variance inflation factors after regress", "rvfplot plots residuals vs fitted values \u2014 no pattern means correct specification", "dfbeta identifies influential observations that affect specific coefficients"],
         desc: "estat hettest, ovtest, vif",
         lesson: `<h3>Overview</h3>
 <p>Stata provides post-estimation commands (<code>estat</code>) that run diagnostic tests on the most recently estimated model. These should be a standard part of any regression workflow.</p>
@@ -2024,6 +2060,7 @@ gen lwage = 1.0 + 0.10*educ + 0.02*exper + 0.01*tenure ///
       {
         id: "st_iv",
         title: "Instrumental variables in Stata",
+        concepts: ["ivregress 2sls implements two-stage least squares estimation", "ivreg2 (ssc install ivreg2) provides weak instrument tests and overid tests", "estat firststage reports first-stage F-statistics and partial R-squared", "xtivreg handles IV estimation with panel fixed effects"],
         desc: "ivregress, first stage, estat firststage",
         lesson: `<h3>Overview</h3>
 <p>Stata's <code>ivregress</code> command implements 2SLS, LIML, and GMM estimation. It's the standard tool for IV in applied microeconomics and integrates seamlessly with <code>estat firststage</code> for first-stage diagnostics.</p>
@@ -2071,6 +2108,7 @@ gen lwage = 0.5 + 0.15*educ + 0.4*ability + rnormal(0,0.5)</pre>
       {
         id: "st_panel",
         title: "Panel data in Stata",
+        concepts: ["xtset declares panel structure: unit variable then time variable", "xtreg, fe estimates within-estimator; xtreg, re estimates random effects", "xtreg, fe vce(cluster id) clusters SEs at the panel unit level", "xttest0 tests for random effects; hausman tests FE vs RE consistency"],
         desc: "xtset, xtreg, reghdfe, clustered SEs",
         lesson: `<h3>Overview</h3>
 <p>Stata is the dominant environment for panel econometrics in applied economics. <code>xtset</code> declares the panel structure, and <code>reghdfe</code> (community-contributed) handles high-dimensional fixed effects efficiently.</p>
@@ -2127,6 +2165,7 @@ xtset state year</pre>
       {
         id: "st_ts",
         title: "Time series in Stata",
+        concepts: ["tsset declares time series structure \u2014 must be evenly spaced", "dfuller performs augmented Dickey-Fuller unit root test", "arima estimates ARIMA models; predict generates forecasts", "var estimates vector autoregressions; irf plots impulse response functions"],
         desc: "tsset, dfuller, arima, ac/pac",
         lesson: `<h3>Overview</h3>
 <p>Stata's time series capabilities are comprehensive. After declaring the time structure with <code>tsset</code>, all time series operators (<code>L.</code>, <code>D.</code>, <code>F.</code>) become available, and specialized commands like <code>dfuller</code> and <code>arima</code> handle standard diagnostics and modeling.</p>
@@ -2183,6 +2222,7 @@ gen gdp_growth = (gdp_level - L.gdp_level) / L.gdp_level * 100</pre>
       {
         id: "st_did",
         title: "Difference-in-differences in Stata",
+        concepts: ["csdid implements Callaway-Sant'Anna DiD for staggered adoption", "reghdfe absorbs high-dimensional fixed effects efficiently", "estat pretrend tests parallel trends assumption pre-treatment", "Event study coefficients should be near zero before treatment date"],
         desc: "DiD regression, event study, parallel trends",
         lesson: `<h3>Overview</h3>
 <p>DiD is ubiquitous in policy evaluation. Stata's community-contributed <code>csdid</code> package implements Callaway-Sant'Anna (2021) for staggered adoption, while TWFE with interaction terms handles the classic 2×2 case.</p>
@@ -2240,6 +2280,7 @@ xtset state period</pre>
       {
         id: "st_rd",
         title: "Regression discontinuity in Stata",
+        concepts: ["rdrobust implements optimal bandwidth RD estimation in Stata", "rddensity tests for discontinuity in density at the cutoff", "cmogram plots conditional means by running variable bins", "Always test balance of predetermined covariates at the cutoff"],
         desc: "rdrobust, rdplot, rddensity",
         lesson: `<h3>Overview</h3>
 <p>Stata's <code>rdrobust</code>, <code>rdplot</code>, and <code>rddensity</code> packages (available via SSC) provide a complete RD toolkit. These are the same algorithms used in R's rdrobust package — developed by the same authors.</p>
@@ -2284,6 +2325,7 @@ gen earnings   = 25000 + 8000*scholarship + 400*(score-70) + rnormal(0,3000)</pr
       {
         id: "glm_bridge",
         title: "GLM Bridge — Logit, Poisson & Tobit",
+        concepts: ["OLS is inconsistent for binary, count, and censored outcomes", "Logit models log-odds; always report Average Marginal Effects, not raw coefficients", "Poisson assumes mean equals variance \u2014 test for overdispersion before using", "Tobit models the latent continuous variable when outcomes are censored at a limit"],
         desc: "Binary, count, and censored outcomes — when OLS breaks down",
         lesson: `<h3>Overview</h3><p>OLS assumes a continuous unbounded dependent variable. When your outcome is binary (0/1), a count (0,1,2...), or censored, OLS produces biased estimates. The fix is a Generalized Linear Model (GLM) matched to your data-generating process.</p><h3>The Three Core Cases</h3><p><strong>Binary (Logit/Probit):</strong> y in {0,1}. Report Average Marginal Effects (AMEs) — raw coefficients are log-odds and uninterpretable as effects.</p><p><strong>Count (Poisson/NB):</strong> y = 0,1,2... Poisson assumes mean = variance. If overdispersed, use Negative Binomial. PPML is the workhorse for trade models.</p><p><strong>Censored (Tobit):</strong> y observed only above/below a threshold (e.g. WTP, hours worked). Models the latent continuous variable.</p><h3>R (fixest + marginaleffects)</h3><pre><code>library(fixest); library(marginaleffects)
 # Logit
@@ -2310,6 +2352,7 @@ tobit y_cens x1 x2, ll(0)</code></pre><div class="watchout"><strong>Watch out:</
       ,{
         id: "st_viz",
         title: "Visualization & output in Stata",
+        concepts: ["twoway combines multiple plot types on one graph", "scheme s2mono or lean2 produce cleaner publication-ready output", "coefplot (ssc install coefplot) creates coefficient plots from stored estimates", "graph export saves figures as PDF, PNG, or EPS for publication"],
         desc: "twoway, coefplot, outreg2, LaTeX export",
         lesson: `<h3>Overview</h3>
 <p>Professional output in Stata combines publication-quality graphs with structured regression tables. The combination of Stata's <code>twoway</code> graphing system, <code>coefplot</code>, and <code>esttab</code> covers most applied research needs.</p>

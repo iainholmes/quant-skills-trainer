@@ -845,45 +845,14 @@ function generateKeyConcepts(mod) {
   var content = document.getElementById('key-concepts-content');
   if (!box || !content) return;
 
-  // Reset
   box.classList.remove('show');
-  content.innerHTML = '<div class="key-concepts-loading">Generating summary...</div>';
 
-  if (!apiKey || apiKey.length < 20) return;
-
-  var lessonText = mod.lesson.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 2000);
+  if (!mod.concepts || !mod.concepts.length) return;
 
   box.classList.add('show');
-
-  fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 200,
-      messages: [{
-        role: 'user',
-        content: 'Extract exactly 4 key concepts from this econometrics lesson as concise bullet points (max 12 words each). Return only a JSON array of strings, no other text.\n\nLesson:\n' + lessonText
-      }]
-    })
-  }).then(function(res) { return res.json(); })
-  .then(function(data) {
-    var text = data.content && data.content[0] && data.content[0].text;
-    if (!text) return;
-    var clean = text.replace(/```json|```/g, '').trim();
-    var points = JSON.parse(clean);
-    if (!Array.isArray(points)) return;
-    content.innerHTML = '<ul class="key-concepts-list">' +
-      points.map(function(p) { return '<li>' + p + '</li>'; }).join('') +
-      '</ul>';
-  }).catch(function() {
-    box.classList.remove('show');
-  });
+  content.innerHTML = '<ul class="key-concepts-list">' +
+    mod.concepts.map(function(p) { return '<li>' + p + '</li>'; }).join('') +
+    '</ul>';
 }
 
 // ── Personalised exercise ─────────────────────────────────────────────────────
