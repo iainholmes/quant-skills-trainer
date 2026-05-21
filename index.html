@@ -275,7 +275,7 @@ header{background:var(--surface);border-bottom:1px solid var(--border);height:60
 
 /* Phase bar */
 .phase-bar{display:flex;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:2rem;background:var(--surface2);}
-.phase-btn{flex:1;padding:10px 0;font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:0.05em;text-transform:uppercase;text-align:center;cursor:pointer;border:none;background:transparent;color:var(--text3);transition:all 0.2s;border-bottom:2px solid transparent;}
+.phase-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 0;font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:0.05em;text-transform:uppercase;text-align:center;cursor:pointer;border:none;background:transparent;color:var(--text3);transition:all 0.2s;border-bottom:2px solid transparent;}
 .phase-btn:hover{color:var(--text);}
 .phase-btn.on-py   {background:var(--surface);color:var(--py);   border-bottom-color:var(--py);}
 .phase-btn.on-r    {background:var(--surface);color:var(--r);    border-bottom-color:var(--r);}
@@ -362,6 +362,10 @@ footer a:hover{color:var(--text2);}
 .key-concepts-list li{font-size:13px;color:var(--ink-mid,#4a5568);line-height:1.5;display:flex;gap:8px;align-items:flex-start}
 .key-concepts-list li::before{content:'→';color:var(--lang);flex-shrink:0;font-weight:600}
 .key-concepts-loading{font-size:12px;color:var(--ink-light,#888);font-style:italic}
+
+.phase-step{display:block;font-size:9px;letter-spacing:.12em;opacity:.45;margin-bottom:1px;font-weight:600}
+.phase-btn.on-py .phase-step,.phase-btn.on-r .phase-step,.phase-btn.on-stata .phase-step{opacity:.7}
+.phase-connector{color:var(--text3);font-size:11px;opacity:.4;flex-shrink:0;padding:0 2px;align-self:center}
 </style>
 </head>
 <body>
@@ -524,9 +528,11 @@ footer a:hover{color:var(--text2);}
       </div>
 
       <div class="phase-bar">
-        <button class="phase-btn" id="pbtn-learn"    onclick="switchPhase('learn')">Learn</button>
-        <button class="phase-btn" id="pbtn-practice" onclick="switchPhase('practice')">Practice</button>
-        <button class="phase-btn" id="pbtn-feedback" onclick="switchPhase('feedback')">Feedback</button>
+        <button class="phase-btn" id="pbtn-learn"    onclick="switchPhase('learn')"><span class="phase-step">01</span>Learn</button>
+        <span class="phase-connector">→</span>
+        <button class="phase-btn" id="pbtn-practice" onclick="switchPhase('practice')"><span class="phase-step">02</span>Practice</button>
+        <span class="phase-connector">→</span>
+        <button class="phase-btn" id="pbtn-feedback" onclick="switchPhase('feedback')"><span class="phase-step">03</span>Feedback</button>
       </div>
 
       <!-- Learn -->
