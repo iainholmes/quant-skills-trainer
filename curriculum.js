@@ -775,8 +775,34 @@ lwage = (1.5 + 0.20*d + X @ beta_x * 0.5
 <li><strong>4.</strong> Which estimate is closest to the true effect of 0.20? Explain why DML is preferred.</li>
 </ul>
 <p><strong>Expected output:</strong> Naive OLS biased; DML estimate ~0.20; written comparison of the three approaches.</p>`
-      },
+      },,
       {
+        id: "glm_bridge",
+        title: "GLM Bridge — Logit, Poisson & Tobit",
+        desc: "Binary, count, and censored outcomes — when OLS breaks down",
+        lesson: `<h3>Overview</h3><p>OLS assumes a continuous unbounded dependent variable. When your outcome is binary (0/1), a count (0,1,2...), or censored, OLS produces biased estimates. The fix is a Generalized Linear Model (GLM) matched to your data-generating process.</p><h3>The Three Core Cases</h3><p><strong>Binary (Logit/Probit):</strong> y in {0,1}. Report Average Marginal Effects (AMEs) — raw coefficients are log-odds and uninterpretable as effects.</p><p><strong>Count (Poisson/NB):</strong> y = 0,1,2... Poisson assumes mean = variance. If overdispersed, use Negative Binomial. PPML is the workhorse for trade models.</p><p><strong>Censored (Tobit):</strong> y observed only above/below a threshold (e.g. WTP, hours worked). Models the latent continuous variable.</p><h3>R (fixest + marginaleffects)</h3><pre><code>library(fixest); library(marginaleffects)
+# Logit
+m <- feglm(y ~ x1 + x2 | fe, family=binomial('logit'), data=df)
+avg_slopes(m)  # AMEs
+# Poisson
+fepois(y_count ~ x1 + x2 | fe, data=df)
+# Negative Binomial
+feglm(y_count ~ x1 + x2 | fe, family=negbin, data=df)</code></pre><h3>Python (statsmodels)</h3><pre><code>import statsmodels.formula.api as smf
+smf.logit('y ~ x1 + x2', data=df).fit().get_margeff().summary()
+smf.poisson('y_count ~ x1 + x2', data=df).fit()
+smf.negativebinomial('y_count ~ x1 + x2', data=df).fit()</code></pre><h3>Stata</h3><pre><code>logit y x1 x2, robust
+margins, dydx(*)
+poisson y_count x1 x2, robust
+nbreg y_count x1 x2, robust
+tobit y_cens x1 x2, ll(0)</code></pre><div class="watchout"><strong>Watch out:</strong> Never interpret GLM coefficients directly as marginal effects. Always compute AMEs. For Logit, coefficients are log-odds. For Poisson, exponentiated coefficients are incidence rate ratios. For Tobit, coefficients are effects on the latent variable, not the observed outcome.</div>`,
+        exercise: `Identify whether your dependent variable is binary, count, or censored. Then:
+1. Run the appropriate GLM (Logit, Poisson, or Tobit) in your language
+2. Report the model summary and check convergence
+3. Compute Average Marginal Effects for your key treatment variable
+4. Compare to what OLS would have given — note the difference
+5. If using Poisson, check for overdispersion (compare mean and variance of y)`
+      }
+      ,{
         id: "py_viz",
         title: "Research visualization",
         desc: "coefficient plots, event studies, publication figures",
@@ -1508,8 +1534,34 @@ child_dev <- (60 - 0.3*(poverty_rate - 59.2) + 5*eligible
 <li><strong>4.</strong> Run the estimator at bandwidths h=5 and h=15 (use <code>h=</code> argument). How sensitive is the estimate?</li>
 </ul>
 <p><strong>Expected output:</strong> rdplot with visible jump; main estimate ~5; rddensity non-significant; bandwidth sensitivity table.</p>`
-      },
+      },,
       {
+        id: "glm_bridge",
+        title: "GLM Bridge — Logit, Poisson & Tobit",
+        desc: "Binary, count, and censored outcomes — when OLS breaks down",
+        lesson: `<h3>Overview</h3><p>OLS assumes a continuous unbounded dependent variable. When your outcome is binary (0/1), a count (0,1,2...), or censored, OLS produces biased estimates. The fix is a Generalized Linear Model (GLM) matched to your data-generating process.</p><h3>The Three Core Cases</h3><p><strong>Binary (Logit/Probit):</strong> y in {0,1}. Report Average Marginal Effects (AMEs) — raw coefficients are log-odds and uninterpretable as effects.</p><p><strong>Count (Poisson/NB):</strong> y = 0,1,2... Poisson assumes mean = variance. If overdispersed, use Negative Binomial. PPML is the workhorse for trade models.</p><p><strong>Censored (Tobit):</strong> y observed only above/below a threshold (e.g. WTP, hours worked). Models the latent continuous variable.</p><h3>R (fixest + marginaleffects)</h3><pre><code>library(fixest); library(marginaleffects)
+# Logit
+m <- feglm(y ~ x1 + x2 | fe, family=binomial('logit'), data=df)
+avg_slopes(m)  # AMEs
+# Poisson
+fepois(y_count ~ x1 + x2 | fe, data=df)
+# Negative Binomial
+feglm(y_count ~ x1 + x2 | fe, family=negbin, data=df)</code></pre><h3>Python (statsmodels)</h3><pre><code>import statsmodels.formula.api as smf
+smf.logit('y ~ x1 + x2', data=df).fit().get_margeff().summary()
+smf.poisson('y_count ~ x1 + x2', data=df).fit()
+smf.negativebinomial('y_count ~ x1 + x2', data=df).fit()</code></pre><h3>Stata</h3><pre><code>logit y x1 x2, robust
+margins, dydx(*)
+poisson y_count x1 x2, robust
+nbreg y_count x1 x2, robust
+tobit y_cens x1 x2, ll(0)</code></pre><div class="watchout"><strong>Watch out:</strong> Never interpret GLM coefficients directly as marginal effects. Always compute AMEs. For Logit, coefficients are log-odds. For Poisson, exponentiated coefficients are incidence rate ratios. For Tobit, coefficients are effects on the latent variable, not the observed outcome.</div>`,
+        exercise: `Identify whether your dependent variable is binary, count, or censored. Then:
+1. Run the appropriate GLM (Logit, Poisson, or Tobit) in your language
+2. Report the model summary and check convergence
+3. Compute Average Marginal Effects for your key treatment variable
+4. Compare to what OLS would have given — note the difference
+5. If using Poisson, check for overdispersion (compare mean and variance of y)`
+      }
+      ,{
         id: "r_viz",
         title: "Publication visualization with ggplot2",
         desc: "ggplot themes, coefficient plots, saving",
@@ -2228,8 +2280,34 @@ gen earnings   = 25000 + 8000*scholarship + 400*(score-70) + rnormal(0,3000)</pr
 <li><strong>4.</strong> Run <code>rddensity score, c(70)</code>. Interpret the result — is there evidence of manipulation?</li>
 </ul>
 <p><strong>Expected output:</strong> rdplot with clear jump at 70; rdrobust estimate ~8000; bandwidth robustness; rddensity interpretation.</p>`
-      },
+      },,
       {
+        id: "glm_bridge",
+        title: "GLM Bridge — Logit, Poisson & Tobit",
+        desc: "Binary, count, and censored outcomes — when OLS breaks down",
+        lesson: `<h3>Overview</h3><p>OLS assumes a continuous unbounded dependent variable. When your outcome is binary (0/1), a count (0,1,2...), or censored, OLS produces biased estimates. The fix is a Generalized Linear Model (GLM) matched to your data-generating process.</p><h3>The Three Core Cases</h3><p><strong>Binary (Logit/Probit):</strong> y in {0,1}. Report Average Marginal Effects (AMEs) — raw coefficients are log-odds and uninterpretable as effects.</p><p><strong>Count (Poisson/NB):</strong> y = 0,1,2... Poisson assumes mean = variance. If overdispersed, use Negative Binomial. PPML is the workhorse for trade models.</p><p><strong>Censored (Tobit):</strong> y observed only above/below a threshold (e.g. WTP, hours worked). Models the latent continuous variable.</p><h3>R (fixest + marginaleffects)</h3><pre><code>library(fixest); library(marginaleffects)
+# Logit
+m <- feglm(y ~ x1 + x2 | fe, family=binomial('logit'), data=df)
+avg_slopes(m)  # AMEs
+# Poisson
+fepois(y_count ~ x1 + x2 | fe, data=df)
+# Negative Binomial
+feglm(y_count ~ x1 + x2 | fe, family=negbin, data=df)</code></pre><h3>Python (statsmodels)</h3><pre><code>import statsmodels.formula.api as smf
+smf.logit('y ~ x1 + x2', data=df).fit().get_margeff().summary()
+smf.poisson('y_count ~ x1 + x2', data=df).fit()
+smf.negativebinomial('y_count ~ x1 + x2', data=df).fit()</code></pre><h3>Stata</h3><pre><code>logit y x1 x2, robust
+margins, dydx(*)
+poisson y_count x1 x2, robust
+nbreg y_count x1 x2, robust
+tobit y_cens x1 x2, ll(0)</code></pre><div class="watchout"><strong>Watch out:</strong> Never interpret GLM coefficients directly as marginal effects. Always compute AMEs. For Logit, coefficients are log-odds. For Poisson, exponentiated coefficients are incidence rate ratios. For Tobit, coefficients are effects on the latent variable, not the observed outcome.</div>`,
+        exercise: `Identify whether your dependent variable is binary, count, or censored. Then:
+1. Run the appropriate GLM (Logit, Poisson, or Tobit) in your language
+2. Report the model summary and check convergence
+3. Compute Average Marginal Effects for your key treatment variable
+4. Compare to what OLS would have given — note the difference
+5. If using Poisson, check for overdispersion (compare mean and variance of y)`
+      }
+      ,{
         id: "st_viz",
         title: "Visualization & output in Stata",
         desc: "twoway, coefplot, outreg2, LaTeX export",
