@@ -346,6 +346,8 @@ footer a:hover{color:var(--text2);}
 @keyframes spin{to{transform:rotate(360deg);}}
 .module-list::-webkit-scrollbar{width:5px;}
 .module-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+.personalised-badge{display:inline-block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:500;color:var(--lang);border:.5px solid var(--lang);border-radius:4px;padding:3px 8px;margin-bottom:10px;opacity:.8}
 </style>
 </head>
 <body>
@@ -696,6 +698,8 @@ function openModule(modId) {
   document.getElementById('learn-out').innerHTML    = mod.lesson;
   const fw = document.getElementById('focus-warning'); if (fw) fw.style.display = 'none';
   document.getElementById('exercise-out').innerHTML = mod.exercise;
+  // Personalise exercise if Advisor session exists and API key is set
+  personaliseExercise(mod);
   const fb = document.getElementById('feedback-out');
   fb.className='ai-box empty'; fb.textContent='Submit your code in the Practice tab to receive feedback here.';
   const doneBtn = document.getElementById('done-btn');
@@ -781,6 +785,49 @@ async function submitCode() {
   } finally {
     btn.disabled=false; inner.textContent='Submit for review';
   }
+}
+
+
+// ── Personalised exercise ─────────────────────────────────────────────────────
+function personaliseExercise(mod) {
+  if (!apiKey || apiKey.length < 20) return;
+  var advisorCtx = null;
+  try {
+    var raw = localStorage.getItem('qst_advisor_session_v1');
+    if (raw) advisorCtx = JSON.parse(raw);
+  } catch(e) {}
+  if (!advisorCtx || !advisorCtx.study) return;
+
+  var exerciseEl = document.getElementById('exercise-out');
+  var originalExercise = mod.exercise;
+
+  // Show a subtle loading state
+  exerciseEl.style.opacity = '0.5';
+
+  var prompt = 'Rewrite the following econometrics exercise so it is specific to this student's research design. Keep the same learning objectives and steps, but replace generic variable names and contexts with ones from their actual study. Keep it concise — same length or shorter. Return only the rewritten exercise text, no preamble.\n\nRESEARCH DESIGN:\nStudy: ' + advisorCtx.study + '\nMethod: ' + (advisorCtx.method || '') + '\n\nORIGINAL EXERCISE:\n' + originalExercise.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 400,
+      messages: [{role: 'user', content: prompt}]
+    })
+  }).then(function(res) { return res.json(); }).then(function(data) {
+    var text = data.content && data.content[0] && data.content[0].text;
+    if (text && text.length > 20) {
+      exerciseEl.innerHTML = '<div class="personalised-badge">&#10024; Personalised for your research design</div>' + text.replace(/\n/g, '<br>');
+    }
+    exerciseEl.style.opacity = '1';
+  }).catch(function() {
+    exerciseEl.style.opacity = '1';
+  });
 }
 
 // ── Mark done ─────────────────────────────────────────────────────────────────
