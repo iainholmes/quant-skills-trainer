@@ -804,7 +804,7 @@ function personaliseExercise(mod) {
   // Show a subtle loading state
   exerciseEl.style.opacity = '0.5';
 
-  var prompt = 'Rewrite the following econometrics exercise so it is specific to this student's research design. Keep the same learning objectives and steps, but replace generic variable names and contexts with ones from their actual study. Keep it concise — same length or shorter. Return only the rewritten exercise text, no preamble.\n\nRESEARCH DESIGN:\nStudy: ' + advisorCtx.study + '\nMethod: ' + (advisorCtx.method || '') + '\n\nORIGINAL EXERCISE:\n' + originalExercise.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  var prompt = 'Rewrite the following econometrics exercise so it is specific to this student\'s research design. Keep the same learning objectives and steps, but replace generic variable names and contexts with ones from their actual study. Keep it concise — same length or shorter. Return only the rewritten exercise text, no preamble.\n\nRESEARCH DESIGN:\nStudy: ' + advisorCtx.study + '\nMethod: ' + (advisorCtx.method || '') + '\n\nORIGINAL EXERCISE:\n' + originalExercise.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
   fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
