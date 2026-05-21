@@ -354,6 +354,14 @@ footer a:hover{color:var(--text2);}
 .tier-head.collapsed::after{content:'+'}
 .tier-modules{overflow:hidden;transition:max-height .25s ease}
 .tier-modules.collapsed{max-height:0!important}
+
+.key-concepts-box{background:var(--surface-soft,#f8fafc);border-left:3px solid var(--lang);border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:1.25rem;display:none}
+.key-concepts-box.show{display:block}
+.key-concepts-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--lang);margin-bottom:8px}
+.key-concepts-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}
+.key-concepts-list li{font-size:13px;color:var(--ink-mid,#4a5568);line-height:1.5;display:flex;gap:8px;align-items:flex-start}
+.key-concepts-list li::before{content:'→';color:var(--lang);flex-shrink:0;font-weight:600}
+.key-concepts-loading{font-size:12px;color:var(--ink-light,#888);font-style:italic}
 </style>
 </head>
 <body>
@@ -524,6 +532,10 @@ footer a:hover{color:var(--text2);}
       <!-- Learn -->
       <div class="phase-panel visible" id="panel-learn">
         <div id="focus-warning" style="display:none; background:#fff8e6; border:1px solid #fde68a; border-left:4px solid #f59e0b; padding:16px 20px; border-radius:8px; margin-bottom:1.5rem; font-size:14px; color:#92400e; box-shadow:0 2px 4px rgba(0,0,0,0.02); line-height:1.6;"></div>
+        <div class="key-concepts-box" id="key-concepts-box">
+          <div class="key-concepts-label">Key concepts</div>
+          <div id="key-concepts-content"><div class="key-concepts-loading">Generating summary...</div></div>
+        </div>
         <div class="content-box" id="learn-out"></div>
       </div>
 
@@ -733,6 +745,7 @@ function openModule(modId) {
   document.getElementById('sess-pill').className    = `lang-pill pill-${suf}`;
   document.getElementById('sess-pill').textContent  = lbl;
   document.getElementById('learn-out').innerHTML    = mod.lesson;
+  generateKeyConcepts(mod);
   const fw = document.getElementById('focus-warning'); if (fw) fw.style.display = 'none';
   document.getElementById('exercise-out').innerHTML = mod.exercise;
   // Personalise exercise if Advisor session exists and API key is set
@@ -824,6 +837,54 @@ async function submitCode() {
   }
 }
 
+
+
+// ── Key concepts summary ──────────────────────────────────────────────────────
+function generateKeyConcepts(mod) {
+  var box = document.getElementById('key-concepts-box');
+  var content = document.getElementById('key-concepts-content');
+  if (!box || !content) return;
+
+  // Reset
+  box.classList.remove('show');
+  content.innerHTML = '<div class="key-concepts-loading">Generating summary...</div>';
+
+  if (!apiKey || apiKey.length < 20) return;
+
+  var lessonText = mod.lesson.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 2000);
+
+  box.classList.add('show');
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 200,
+      messages: [{
+        role: 'user',
+        content: 'Extract exactly 4 key concepts from this econometrics lesson as concise bullet points (max 12 words each). Return only a JSON array of strings, no other text.\n\nLesson:\n' + lessonText
+      }]
+    })
+  }).then(function(res) { return res.json(); })
+  .then(function(data) {
+    var text = data.content && data.content[0] && data.content[0].text;
+    if (!text) return;
+    var clean = text.replace(/```json|```/g, '').trim();
+    var points = JSON.parse(clean);
+    if (!Array.isArray(points)) return;
+    content.innerHTML = '<ul class="key-concepts-list">' +
+      points.map(function(p) { return '<li>' + p + '</li>'; }).join('') +
+      '</ul>';
+  }).catch(function() {
+    box.classList.remove('show');
+  });
+}
 
 // ── Personalised exercise ─────────────────────────────────────────────────────
 function personaliseExercise(mod) {
