@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quant Skills Trainer</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNyIgZmlsbD0iIzFhMTkxNiIvPgogIDxjaXJjbGUgY3g9IjEwIiBjeT0iMTYiIHI9IjMuNSIgZmlsbD0iIzJlN2QzMiIvPgogIDxjaXJjbGUgY3g9IjE5IiBjeT0iMTAiIHI9IjMuNSIgZmlsbD0iIzJlNTJjMiIvPgogIDxjaXJjbGUgY3g9IjE5IiBjeT0iMjIiIHI9IjMuNSIgZmlsbD0iIzViOGZiOSIvPgogIDxsaW5lIHgxPSIxMy40IiB5MT0iMTQuMyIgeDI9IjE1LjciIHkyPSIxMS40IiBzdHJva2U9IiM1NTUiIHN0cm9rZS13aWR0aD0iMS4yIi8+CiAgPGxpbmUgeDE9IjEzLjQiIHkxPSIxNy43IiB4Mj0iMTUuNyIgeTI9IjIwLjYiIHN0cm9rZT0iIzU1NSIgc3Ryb2tlLXdpZHRoPSIxLjIiLz4KPC9zdmc+Cg==">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f8fafc; --surface:#ffffff; --surface2:#f1f5f9;
+  --border:#e2e8f0; --border2:#cbd5e1;
+  --text:#1e293b; --text2:#475569; --text3:#64748b;
+  --mono:'DM Mono',monospace; --sans:'DM Sans',sans-serif;
+  --py:#2e7d32; --py-light:#e8f5e9; --py-border:#a5d6a7;
+  --r:#2e52c2;  --r-light:#eaeefc;  --r-border:#a0b4ec;
+  --stata:#5b8fb9; --stata-light:#eef4fa; --stata-border:#b3cfe8;
+  --lang:var(--py); --lang-light:var(--py-light); --lang-border:var(--py-border);
+  --radius:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.65;display:flex;justify-content:center;}
+
+.app-wrapper{width:100%;max-width:1200px;background:var(--surface);box-shadow:0 0 40px rgba(0,0,0,0.04);min-height:100vh;display:flex;flex-direction:column;}
+
+/* Header */
+header{background:var(--surface);border-bottom:1px solid var(--border);height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;position:sticky;top:0;z-index:100;}
+.logo{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:0.06em;display:flex;align-items:center;gap:8px;text-transform:uppercase;}
+.logo-pip{width:8px;height:8px;border-radius:50%;background:var(--py);transition:background 0.3s;}
+.header-right{display:flex;align-items:center;gap:10px;}
+.api-badge{font-family:var(--mono);font-size:11px;letter-spacing:0.05em;padding:4px 12px;border-radius:20px;border:1px solid var(--border2);color:var(--text3);display:flex;align-items:center;gap:6px;text-transform:uppercase;}
+.api-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--border2);}
+.api-badge.connected{border-color:var(--py-border);color:var(--py);}
+.api-badge.connected .dot{background:var(--py);}
+.btn-sm{font-family:var(--mono);font-size:12px;padding:6px 14px;border:1px solid var(--border2);border-radius:var(--radius);background:transparent;color:var(--text2);cursor:pointer;transition:all 0.14s;}
+.btn-sm:hover{background:var(--surface2);color:var(--text);}
+.btn-sm.danger{color:#ef4444;}
+
+/* Modal */
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,0.6);display:flex;align-items:center;justify-content:center;z-index:300;}
+.overlay.hidden{display:none;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:2.5rem;width:440px;max-width:calc(100vw - 2rem);box-shadow:0 10px 40px rgba(0,0,0,0.1);}
+.modal h2{font-family:var(--mono);font-size:14px;font-weight:500;letter-spacing:0.04em;margin-bottom:8px;}
+.modal p{font-size:14px;color:var(--text2);margin-bottom:1.2rem;}
+.modal input[type=password]{width:100%;font-family:var(--mono);font-size:13px;padding:10px 14px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface2);color:var(--text);outline:none;margin-bottom:10px;}
+.modal input[type=password]:focus{border-color:var(--lang);background:var(--surface);}
+.remember-row{display:flex;align-items:center;gap:8px;margin-bottom:16px;font-size:13px;color:var(--text2);font-family:var(--mono);cursor:pointer;}
+.remember-row input{width:14px;height:14px;accent-color:var(--lang);cursor:pointer;}
+.modal-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.btn-primary{font-family:var(--mono);font-size:13px;font-weight:500;padding:10px 22px;background:var(--lang);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;transition:opacity 0.14s;}
+.btn-primary:hover{opacity:0.86;}
+.modal-note{font-size:12px;font-family:var(--mono);color:var(--text3);margin-top:16px;line-height:1.6;}
+.modal-note a{color:var(--lang);text-decoration:none;}
+.criteria-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem 1.4rem;font-family:var(--mono);font-size:12px;line-height:1.75;color:var(--text2);margin-top:12px;white-space:pre-wrap;}
+
+/* Layout */
+.layout{display:grid;grid-template-columns:280px 1fr;flex:1;}
+
+/* Sidebar */
+.sidebar{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:60px;height:calc(100vh - 60px);overflow:hidden;}
+.lang-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border);flex-shrink:0;}
+.lang-tab{padding:12px 0;text-align:center;font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:0.05em;cursor:pointer;border:none;background:transparent;color:var(--text3);border-bottom:2px solid transparent;transition:all 0.16s;text-transform:uppercase;}
+.lang-tab:hover{color:var(--text2);background:var(--surface2);}
+.lang-tab.active-py   {color:var(--py);   border-bottom-color:var(--py);   background:var(--py-light);}
+.lang-tab.active-r    {color:var(--r);    border-bottom-color:var(--r);    background:var(--r-light);}
+.lang-tab.active-stata{color:var(--stata);border-bottom-color:var(--stata);background:var(--stata-light);}
+.progress-strip{padding:12px 20px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.progress-label{font-family:var(--mono);font-size:11px;letter-spacing:0.06em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;display:flex;justify-content:space-between;}
+.progress-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.progress-fill{height:4px;background:var(--lang);border-radius:2px;transition:width 0.4s,background 0.3s;width:0%;}
+
+/* Reset progress link */
+.reset-row{padding:8px 20px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:flex-end;}
+.reset-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.05em;text-transform:uppercase;color:var(--text3);background:none;border:none;cursor:pointer;padding:2px 0;transition:color 0.14s;}
+.reset-btn:hover{color:#ef4444;}
+
+.module-list{overflow-y:auto;flex:1;padding:0.5rem 0 1.5rem;}
+.tier-head{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);padding:16px 20px 6px;}
+.mod-item{display:flex;align-items:flex-start;gap:12px;padding:10px 20px;cursor:pointer;transition:background 0.12s;border-left:2px solid transparent;}
+.mod-item:hover{background:var(--surface2);}
+.mod-item.active-py   {background:var(--py-light);   border-left-color:var(--py);}
+.mod-item.active-r    {background:var(--r-light);    border-left-color:var(--r);}
+.mod-item.active-stata{background:var(--stata-light);border-left-color:var(--stata);}
+.mod-indicator{width:10px;height:10px;border-radius:50%;margin-top:6px;flex-shrink:0;border:1.5px solid var(--border2);background:transparent;transition:all 0.2s;}
+.mod-indicator.done   {background:var(--lang);border-color:var(--lang);}
+.mod-indicator.current{border-color:var(--lang);}
+.mod-text{flex:1;min-width:0;}
+.mod-name{font-size:14px;color:var(--text);line-height:1.4;}
+.mod-name.muted{color:var(--text2);}
+.mod-desc{font-size:12px;color:var(--text3);font-family:var(--mono);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* Main */
+.main{padding:2.5rem 3rem;max-width:860px;margin:0 auto;width:100%;}
+.welcome{display:block;}
+.welcome-title{font-family:var(--mono);font-size:26px;font-weight:400;margin-bottom:12px;letter-spacing:-0.01em;}
+.welcome-title span{color:var(--lang);transition:color 0.3s;}
+.welcome-sub{font-size:16px;color:var(--text2);margin-bottom:2.5rem;max-width:540px;line-height:1.6;}
+.welcome-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:2.5rem;}
+.lang-card{padding:1.5rem;border-radius:10px;border:1px solid var(--border);background:var(--surface);cursor:pointer;transition:all 0.16s;box-shadow:0 2px 6px rgba(0,0,0,0.02);}
+.lang-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,0.05);}
+.lang-card-py   {border-top:4px solid var(--py);}
+.lang-card-r    {border-top:4px solid var(--r);}
+.lang-card-stata{border-top:4px solid var(--stata);}
+.lang-card-label{font-family:var(--mono);font-size:15px;font-weight:500;margin-bottom:6px;}
+.lang-card-py    .lang-card-label{color:var(--py);}
+.lang-card-r     .lang-card-label{color:var(--r);}
+.lang-card-stata .lang-card-label{color:var(--stata);}
+.lang-card-count{font-size:13px;color:var(--text3);font-family:var(--mono);}
+.welcome-steps{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.5rem 2rem;box-shadow:0 2px 6px rgba(0,0,0,0.02);}
+.welcome-steps h3{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);margin-bottom:16px;}
+.step-row{display:flex;gap:14px;align-items:flex-start;margin-bottom:12px;font-size:15px;color:var(--text2);}
+.step-row:last-child{margin-bottom:0;}
+.step-num{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--lang);min-width:20px;margin-top:2px;}
+
+/* Session */
+.session{display:none;}
+.session.visible{display:block;}
+.sess-back{font-family:var(--mono);font-size:12px;color:var(--text3);cursor:pointer;background:none;border:none;padding:0;letter-spacing:0.03em;margin-bottom:12px;display:flex;align-items:center;gap:6px;transition:color 0.14s;}
+.sess-back:hover{color:var(--text2);}
+.sess-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.sess-title-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.sess-title{font-size:22px;font-weight:500;}
+.lang-pill{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;padding:4px 12px;border-radius:20px;}
+.pill-py   {background:var(--py-light);   color:var(--py);   border:1px solid var(--py-border);}
+.pill-r    {background:var(--r-light);    color:var(--r);    border:1px solid var(--r-border);}
+.pill-stata{background:var(--stata-light);color:var(--stata);border:1px solid var(--stata-border);}
+.sess-desc{font-size:14px;color:var(--text2);margin-top:8px;font-family:var(--mono);}
+
+/* Phase bar */
+.phase-bar{display:flex;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:2rem;background:var(--surface2);}
+.phase-btn{flex:1;padding:10px 0;font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:0.05em;text-transform:uppercase;text-align:center;cursor:pointer;border:none;background:transparent;color:var(--text3);transition:all 0.2s;border-bottom:2px solid transparent;}
+.phase-btn:hover{color:var(--text);}
+.phase-btn.on-py   {background:var(--surface);color:var(--py);   border-bottom-color:var(--py);}
+.phase-btn.on-r    {background:var(--surface);color:var(--r);    border-bottom-color:var(--r);}
+.phase-btn.on-stata{background:var(--surface);color:var(--stata);border-bottom-color:var(--stata);}
+.phase-panel{display:none;}
+.phase-panel.visible{display:block;animation:fadeIn 0.25s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+/* Content */
+.content-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.75rem 2rem;font-size:15px;line-height:1.75;box-shadow:0 2px 6px rgba(0,0,0,0.02);}
+.content-box h3{font-size:16px;font-weight:500;margin:1.2rem 0 0.5rem;color:var(--text);}
+.content-box h3:first-child{margin-top:0;}
+.content-box p{margin:0.5rem 0;}
+.content-box ul{margin:0.5rem 0 0.5rem 1.4rem;}
+.content-box li{margin:0.3rem 0;}
+.content-box pre{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem;font-family:var(--mono);font-size:13px;overflow-x:auto;margin:1rem 0;line-height:1.6;white-space:pre;color:var(--text);}
+.content-box code{font-family:var(--mono);font-size:13px;background:var(--surface2);padding:2px 6px;border-radius:4px;}
+.content-box strong{font-weight:500;color:#0f172a;}
+.content-box .watchout{background:#fefce8;border:1px solid #fef08a;border-radius:var(--radius);padding:1rem 1.25rem;margin-top:1rem;font-size:14px;color:#854d0e;}
+.content-box .watchout strong{color:#713f12;}
+
+/* Practice */
+.practice-section-label{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);margin-top:1.5rem;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.practice-section-label span{font-family:var(--sans);font-size:12px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--text3);opacity:0.8;}
+.code-area{width:100%;min-height:220px;font-family:var(--mono);font-size:14px;padding:18px 20px;border:1px solid var(--border);border-radius:10px;background:#1e293b;color:#f8fafc;resize:vertical;outline:none;line-height:1.6;margin-bottom:4px;box-shadow:inset 0 2px 4px rgba(0,0,0,0.1);}
+.code-area:focus{border-color:var(--lang);}
+.code-area::placeholder{color:#64748b;}
+.output-area{width:100%;min-height:80px;font-family:var(--mono);font-size:13px;padding:14px 16px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text);resize:vertical;outline:none;line-height:1.6;margin-bottom:12px;}
+.output-area:focus{border-color:var(--lang);background:var(--surface);}
+.output-area::placeholder{color:var(--text3);}
+.action-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.submit-btn{font-family:var(--mono);font-size:13px;font-weight:500;padding:10px 20px;border-radius:var(--radius);border:1px solid var(--lang);background:var(--lang-light);color:var(--lang);cursor:pointer;transition:all 0.14s;display:inline-flex;align-items:center;gap:8px;}
+.submit-btn:hover{background:var(--lang);color:#fff;}
+.submit-btn:disabled{opacity:0.45;cursor:not-allowed;}
+.submit-btn:disabled:hover{background:var(--lang-light);color:var(--lang);}
+.dl-btn{font-family:var(--mono);font-size:12px;padding:10px 16px;border:1px solid var(--border2);border-radius:var(--radius);background:transparent;color:var(--text2);cursor:pointer;transition:all 0.14s;}
+.dl-btn:hover{background:var(--surface2);color:var(--text);}
+.kbd-hint{font-family:var(--mono);font-size:11px;color:var(--text3);margin-left:auto;}
+
+/* Feedback */
+.ai-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.75rem 2rem;font-size:15px;line-height:1.75;min-height:100px;box-shadow:0 2px 6px rgba(0,0,0,0.02);}
+.ai-box.empty{color:var(--text3);font-family:var(--mono);font-size:13px;}
+.ai-box pre{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem;font-family:var(--mono);font-size:13px;overflow-x:auto;margin:12px 0;line-height:1.6;white-space:pre;}
+.ai-box code{font-family:var(--mono);font-size:13px;background:var(--surface2);padding:2px 6px;border-radius:4px;}
+.ai-box strong{font-weight:500;}
+.ai-box p{margin:8px 0;}
+.ai-box h3{font-size:16px;font-weight:500;margin:16px 0 6px;}
+.feedback-actions{display:flex;gap:10px;align-items:center;margin-top:1.5rem;flex-wrap:wrap;}
+.done-btn{font-family:var(--mono);font-size:13px;font-weight:500;padding:10px 22px;border-radius:var(--radius);border:none;background:var(--lang);color:#fff;cursor:pointer;transition:all 0.14s;display:none;}
+.done-btn:hover{opacity:0.86;}
+.done-btn.visible{display:inline-flex;align-items:center;gap:8px;}
+.done-btn.completed{opacity:0.55;cursor:default;pointer-events:none;}
+.copy-fb-btn,.criteria-toggle{font-family:var(--mono);font-size:12px;padding:10px 16px;border:1px solid var(--border2);border-radius:var(--radius);background:transparent;color:var(--text2);cursor:pointer;transition:all 0.14s;display:none;}
+.copy-fb-btn:hover,.criteria-toggle:hover{background:var(--surface2);}
+.copy-fb-btn.visible,.criteria-toggle.visible{display:inline-flex;}
+
+/* Error */
+.ai-box .err{color:#ef4444;font-family:var(--mono);font-size:13px;}
+.ai-box .err-detail{display:block;color:var(--text3);margin-top:6px;font-size:12px;}
+
+/* Footer */
+footer{border-top:1px solid var(--border);padding:16px 3rem;font-family:var(--mono);font-size:11px;color:var(--text3);display:flex;justify-content:space-between;align-items:center;letter-spacing:0.03em;}
+footer a{color:var(--text3);text-decoration:none;}
+footer a:hover{color:var(--text2);}
+
+/* Spinner */
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.35);border-top-color:currentColor;border-radius:50%;animation:spin 0.65s linear infinite;vertical-align:middle;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.module-list::-webkit-scrollbar{width:5px;}
+.module-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<div class="app-wrapper">
+
+<header>
+  <div class="logo"><div class="logo-pip" id="logo-pip"></div>Quant Skills Trainer</div>
+  <div class="header-right">
+    <div class="api-badge" id="api-badge"><div class="dot"></div><span id="api-label">No key</span></div>
+    <button class="btn-sm" onclick="openModal()">Set API key</button>
+  </div>
+</header>
+
+<!-- API Key Modal -->
+<div class="overlay hidden" id="modal-overlay">
+  <div class="modal">
+    <h2>Anthropic API Key</h2>
+    <p>Used only for code feedback — never logged or sent anywhere except Anthropic's API.</p>
+    <input type="password" id="api-key-input" placeholder="sk-ant-..." />
+    <label class="remember-row">
+      <input type="checkbox" id="remember-key"> Remember key in this browser
+    </label>
+    <div class="modal-row">
+      <button class="btn-primary" onclick="saveKey()">Save key</button>
+      <button class="btn-sm" onclick="closeModal()">Cancel</button>
+      <button class="btn-sm danger" onclick="clearKey()" id="clear-key-btn" style="display:none;">Clear saved key</button>
+    </div>
+    <div class="modal-note">Get your key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> → API Keys.<br>Usage billed to your Anthropic account at standard rates.</div>
+  </div>
+</div>
+
+<!-- Criteria Modal -->
+<div class="overlay hidden" id="criteria-overlay">
+  <div class="modal">
+    <h2>AI Evaluation Criteria</h2>
+    <p>The exact system prompt sent to Claude when reviewing your code submissions.</p>
+    <div class="criteria-box" id="criteria-text"></div>
+    <div style="margin-top:1.5rem;"><button class="btn-sm" onclick="document.getElementById('criteria-overlay').classList.add('hidden')">Close</button></div>
+  </div>
+</div>
+
+<!-- Reset Confirm Modal -->
+<div class="overlay hidden" id="reset-overlay">
+  <div class="modal">
+    <h2>Reset all progress?</h2>
+    <p>This will clear your completion status across all languages and modules. Your API key is not affected. This cannot be undone.</p>
+    <div class="modal-row">
+      <button class="btn-primary" style="background:#ef4444;" onclick="confirmReset()">Yes, reset</button>
+      <button class="btn-sm" onclick="document.getElementById('reset-overlay').classList.add('hidden')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="lang-tabs">
+      <button class="lang-tab" id="tab-py"    onclick="switchLang('python')">Python</button>
+      <button class="lang-tab" id="tab-r"     onclick="switchLang('r')">R</button>
+      <button class="lang-tab" id="tab-stata" onclick="switchLang('stata')">Stata</button>
+    </div>
+    <div class="progress-strip">
+      <div class="progress-label"><span>Progress</span><span id="prog-label">0 / 0</span></div>
+      <div class="progress-track"><div class="progress-fill" id="prog-fill"></div></div>
+    </div>
+    <div class="reset-row">
+      <button class="reset-btn" onclick="document.getElementById('reset-overlay').classList.remove('hidden')">Reset progress</button>
+    </div>
+    <div class="module-list" id="module-list"></div>
+  </aside>
+
+  <div style="display:flex;flex-direction:column;min-height:calc(100vh - 60px);">
+  <main class="main" style="flex:1;">
+
+    <!-- Welcome -->
+    <div class="welcome" id="welcome">
+      <div class="welcome-title">Build your <span id="wt-lang">quant</span> foundation.</div>
+      <div class="welcome-sub">A structured curriculum for econometric modeling in Python, R, and Stata — from clean data to causal inference.</div>
+      <div class="welcome-cards">
+        <div class="lang-card lang-card-py"    onclick="switchLang('python')"><div class="lang-card-label">Python</div><div class="lang-card-count" id="wc-py">— modules</div></div>
+        <div class="lang-card lang-card-r"     onclick="switchLang('r')"     ><div class="lang-card-label">R</div>     <div class="lang-card-count" id="wc-r">— modules</div></div>
+        <div class="lang-card lang-card-stata" onclick="switchLang('stata')" ><div class="lang-card-label">Stata</div> <div class="lang-card-count" id="wc-stata">— modules</div></div>
+      </div>
+      <div class="welcome-steps">
+        <h3>How it works</h3>
+        <div class="step-row"><div class="step-num">01</div><div>Choose a language and select a module from the sidebar</div></div>
+        <div class="step-row"><div class="step-num">02</div><div>Read the lesson — concepts, worked code, and watch-outs</div></div>
+        <div class="step-row"><div class="step-num">03</div><div>Complete the exercise in your local editor (Jupyter, RStudio, Stata)</div></div>
+        <div class="step-row"><div class="step-num">04</div><div>Paste your code and — optionally — your output, then submit for AI feedback</div></div>
+      </div>
+    </div>
+
+    <!-- Session -->
+    <div class="session" id="session">
+      <div class="sess-header">
+        <button class="sess-back" onclick="goBack()">← back</button>
+        <div class="sess-title-row">
+          <div class="sess-title" id="sess-title"></div>
+          <span class="lang-pill" id="sess-pill"></span>
+        </div>
+        <div class="sess-desc" id="sess-desc"></div>
+      </div>
+
+      <div class="phase-bar">
+        <button class="phase-btn" id="pbtn-learn"    onclick="switchPhase('learn')">Learn</button>
+        <button class="phase-btn" id="pbtn-practice" onclick="switchPhase('practice')">Practice</button>
+        <button class="phase-btn" id="pbtn-feedback" onclick="switchPhase('feedback')">Feedback</button>
+      </div>
+
+      <!-- Learn -->
+      <div class="phase-panel visible" id="panel-learn">
+        <div class="content-box" id="learn-out"></div>
+      </div>
+
+      <!-- Practice -->
+      <div class="phase-panel" id="panel-practice">
+        <div class="content-box" id="exercise-out"></div>
+
+        <div class="practice-section-label">Your code <span>— write locally, paste here</span></div>
+        <textarea class="code-area" id="code-input"
+          placeholder="Write your solution in Jupyter / RStudio / Stata, then paste your finished code here.&#10;&#10;Cmd+Enter (Mac) or Ctrl+Enter (Windows) to submit."></textarea>
+
+        <div class="practice-section-label">Your output <span>— optional but improves feedback</span></div>
+        <textarea class="output-area" id="output-input"
+          placeholder="Paste your printed output here (regression table, summary stats, plot description, etc.). Claude will check whether it looks correct alongside your code."></textarea>
+
+        <div class="action-row">
+          <button class="submit-btn" id="submit-btn" onclick="submitCode()">
+            <span id="submit-inner">Submit for review</span>
+          </button>
+          <button class="btn-sm" onclick="clearPractice()">Clear</button>
+          <button class="dl-btn" onclick="downloadCode()" title="Download your code">↓ Download script</button>
+          <span class="kbd-hint">⌘↵ to submit</span>
+        </div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="phase-panel" id="panel-feedback">
+        <div class="ai-box empty" id="feedback-out">Submit your code in the Practice tab to receive feedback here.</div>
+        <div class="feedback-actions">
+          <button class="done-btn"        id="done-btn"      onclick="markDone()">Mark complete ✓</button>
+          <button class="copy-fb-btn"     id="copy-fb-btn"   onclick="copyFeedback()">Copy feedback</button>
+          <button class="criteria-toggle" id="criteria-btn"  onclick="showCriteria()">View evaluation criteria</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+  <footer>
+    <span>Quant Skills Trainer — built for econometrics practice</span>
+    <span><a href="https://iainholmes.github.io" target="_blank">iainholmes.github.io</a></span>
+  </footer>
+  </div>
+</div>
+
+</div><!-- /.app-wrapper -->
+
+<script src="curriculum.js"></script>
+<script>
+// ── State ─────────────────────────────────────────────────────────────────────
+let apiKey = '', currentLang = 'python', currentMod = null;
+let progress = {}, lastFeedbackText = '';
+
+const PROG_KEY = 'qst_progress_v2';
+const LANG_KEY = 'qst_lang_v1';
+const KEY_STOR = 'qst_api_key_v1';
+
+const SYSTEM_PROMPT = (lang) =>
+`You are a senior econometrician reviewing a student's ${lang} code submission.
+Structure your feedback in exactly three sections:
+
+**1. What's correct** — call out specific things done well (functions, logic, style, econometric choices)
+**2. Issues & improvements** — identify concrete problems; reference actual variable names, functions, or line patterns from their code
+**3. Key insight** — the single most important econometric or coding concept illustrated by this exercise
+
+If the student has also provided printed output, assess whether it looks correct given the exercise requirements — flag any suspicious values, unexpected signs, or implausible magnitudes.
+
+Be direct and specific. Avoid generic praise. Keep total response to 250–400 words.`;
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+function boot() {
+  try { progress = JSON.parse(localStorage.getItem(PROG_KEY) || '{}'); } catch(e) { progress = {}; }
+  const saved = localStorage.getItem(LANG_KEY);
+  if (saved && CURRICULUM[saved]) currentLang = saved;
+
+  const savedKey = localStorage.getItem(KEY_STOR);
+  if (savedKey) {
+    apiKey = savedKey;
+    document.getElementById('api-badge').className = 'api-badge connected';
+    document.getElementById('api-label').textContent = 'Key set';
+    document.getElementById('remember-key').checked = true;
+    document.getElementById('clear-key-btn').style.display = '';
+  }
+
+  // Dynamically populate welcome card counts
+  Object.entries(CURRICULUM).forEach(([lang, tiers]) => {
+    const total = tiers.flatMap(t => t.modules).length;
+    const el = document.getElementById('wc-' + (lang === 'python' ? 'py' : lang));
+    if (el) el.textContent = total + ' modules';
+  });
+
+  applyLang(currentLang);
+  renderSidebar();
+
+  document.getElementById('code-input').addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); submitCode(); }
+  });
+}
+
+// ── Language ──────────────────────────────────────────────────────────────────
+function switchLang(lang) {
+  currentLang = lang;
+  localStorage.setItem(LANG_KEY, lang);
+  currentMod = null;
+  applyLang(lang);
+  showWelcome();
+  renderSidebar();
+}
+
+function applyLang(lang) {
+  const map = {
+    python: ['var(--py)','var(--py-light)','var(--py-border)','#2e7d32'],
+    r:      ['var(--r)', 'var(--r-light)', 'var(--r-border)', '#2e52c2'],
+    stata:  ['var(--stata)','var(--stata-light)','var(--stata-border)','#5b8fb9'],
+  };
+  const [l,ll,lb,hex] = map[lang] || map.python;
+  const r = document.documentElement;
+  r.style.setProperty('--lang',l); r.style.setProperty('--lang-light',ll); r.style.setProperty('--lang-border',lb);
+  const ids = {python:'py',r:'r',stata:'stata'};
+  Object.entries(ids).forEach(([k,v]) => {
+    document.getElementById(`tab-${v}`).className = 'lang-tab' + (k===lang ? ` active-${v}` : '');
+  });
+  document.getElementById('logo-pip').style.background = hex;
+  const wl = document.getElementById('wt-lang');
+  if (wl) wl.textContent = lang==='python'?'Python':lang==='r'?'R':'Stata';
+}
+
+// ── Sidebar ───────────────────────────────────────────────────────────────────
+function renderSidebar() {
+  const tiers = CURRICULUM[currentLang]; if (!tiers) return;
+  const allMods = tiers.flatMap(t => t.modules);
+  const done = allMods.filter(m => progress[m.id]).length;
+  document.getElementById('prog-label').textContent = `${done} / ${allMods.length}`;
+  document.getElementById('prog-fill').style.width = (allMods.length ? done/allMods.length*100 : 0) + '%';
+  const suf = currentLang==='python'?'py':currentLang==='r'?'r':'stata';
+  const list = document.getElementById('module-list'); list.innerHTML = '';
+  tiers.forEach(tier => {
+    const h = document.createElement('div'); h.className='tier-head'; h.textContent=tier.tier; list.appendChild(h);
+    tier.modules.forEach(mod => {
+      const isDone=!!progress[mod.id], isActive=currentMod&&currentMod.moduleId===mod.id;
+      const el=document.createElement('div');
+      el.className='mod-item'+(isActive?` active-${suf}`:'');
+      el.onclick=()=>openModule(mod.id);
+      const dot=document.createElement('div');
+      dot.className='mod-indicator'+(isDone?' done':(isActive?' current':''));
+      const txt=document.createElement('div'); txt.className='mod-text';
+      txt.innerHTML=`<div class="mod-name${isDone?' muted':''}">${mod.title}${isDone?' ✓':''}</div><div class="mod-desc">${mod.desc}</div>`;
+      el.appendChild(dot); el.appendChild(txt); list.appendChild(el);
+    });
+  });
+}
+
+// ── Open module ───────────────────────────────────────────────────────────────
+function openModule(modId) {
+  const tiers = CURRICULUM[currentLang]; let mod = null;
+  for (const tier of tiers) { mod = tier.modules.find(m=>m.id===modId); if(mod) break; }
+  if (!mod) return;
+  currentMod = {moduleId:modId}; lastFeedbackText = '';
+  const suf = currentLang==='python'?'py':currentLang==='r'?'r':'stata';
+  const lbl = currentLang==='python'?'Python':currentLang==='r'?'R':'Stata';
+  document.getElementById('sess-title').textContent = mod.title;
+  document.getElementById('sess-desc').textContent  = mod.desc;
+  document.getElementById('sess-pill').className    = `lang-pill pill-${suf}`;
+  document.getElementById('sess-pill').textContent  = lbl;
+  document.getElementById('learn-out').innerHTML    = mod.lesson;
+  document.getElementById('exercise-out').innerHTML = mod.exercise;
+  const fb = document.getElementById('feedback-out');
+  fb.className='ai-box empty'; fb.textContent='Submit your code in the Practice tab to receive feedback here.';
+  const doneBtn = document.getElementById('done-btn');
+  doneBtn.className='done-btn'; doneBtn.textContent='Mark complete ✓'; doneBtn.style.opacity='';
+  document.getElementById('copy-fb-btn').className  = 'copy-fb-btn';
+  document.getElementById('criteria-btn').className = 'criteria-toggle';
+  switchPhase('learn'); showSession(); renderSidebar();
+}
+
+// ── Phase ─────────────────────────────────────────────────────────────────────
+function switchPhase(phase) {
+  const suf=currentLang==='python'?'py':currentLang==='r'?'r':'stata';
+  ['learn','practice','feedback'].forEach(p=>{
+    document.getElementById(`pbtn-${p}`).className='phase-btn'+(p===phase?` on-${suf}`:'');
+    document.getElementById(`panel-${p}`).className='phase-panel'+(p===phase?' visible':'');
+  });
+}
+
+// ── Submit ────────────────────────────────────────────────────────────────────
+async function submitCode() {
+  if (!apiKey) { openModal(); return; }
+  const code = document.getElementById('code-input').value.trim();
+  if (!code) { alert('Paste your code first.'); return; }
+  const output = document.getElementById('output-input').value.trim();
+
+  const tiers=CURRICULUM[currentLang]; let mod=null;
+  for (const tier of tiers) { mod=tier.modules.find(m=>m.id===currentMod.moduleId); if(mod) break; }
+  const langLabel = currentLang==='python'?'Python':currentLang==='r'?'R':'Stata';
+  const exerciseRaw = (mod?mod.exercise:'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
+
+  const btn=document.getElementById('submit-btn'), inner=document.getElementById('submit-inner');
+  btn.disabled=true; inner.innerHTML='<span class="spin"></span> Reviewing…';
+  switchPhase('feedback');
+  const fb=document.getElementById('feedback-out');
+  fb.className='ai-box empty'; fb.textContent='Analysing your code…';
+
+  const system = SYSTEM_PROMPT(langLabel);
+  let userMsg = `Exercise:\n${exerciseRaw}\n\nStudent code:\n\`\`\`\n${code}\n\`\`\``;
+  if (output) userMsg += `\n\nStudent's printed output:\n\`\`\`\n${output}\n\`\`\``;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':apiKey,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true',
+      },
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:1024,
+        system,
+        messages:[{role:'user',content:userMsg}],
+      }),
+    });
+    if (!res.ok) {
+      const err=await res.json().catch(()=>({}));
+      const msg=err.error?.message||`HTTP ${res.status}`;
+      let detail='';
+      if(res.status===401) detail='Your API key appears to be invalid. Click "Set API key" to update it.';
+      else if(res.status===429) detail='Rate limit reached. Wait a moment and try again, or check your usage at console.anthropic.com.';
+      else if(res.status===400) detail='Request rejected — your code may be too long. Try submitting a shorter excerpt.';
+      else detail='Check your internet connection and API key, then try again.';
+      throw Object.assign(new Error(msg),{detail});
+    }
+    const data=await res.json();
+    const text=data.content?.[0]?.text||'(empty response)';
+    lastFeedbackText=text;
+    fb.className='ai-box'; fb.innerHTML=md(text);
+    document.getElementById('done-btn').className    ='done-btn visible';
+    document.getElementById('copy-fb-btn').className ='copy-fb-btn visible';
+    document.getElementById('criteria-btn').className='criteria-toggle visible';
+  } catch(err) {
+    fb.className='ai-box';
+    fb.innerHTML=`<p class="err"><strong>Error:</strong> ${err.message}${err.detail?`<span class="err-detail">${err.detail}</span>`:''}</p>`;
+  } finally {
+    btn.disabled=false; inner.textContent='Submit for review';
+  }
+}
+
+// ── Mark done ─────────────────────────────────────────────────────────────────
+function markDone() {
+  if (!currentMod) return;
+  progress[currentMod.moduleId]=true;
+  try { localStorage.setItem(PROG_KEY,JSON.stringify(progress)); } catch(e) {}
+  const btn=document.getElementById('done-btn');
+  btn.textContent='Completed ✓';
+  btn.classList.add('completed');
+  renderSidebar();
+}
+
+// ── Reset progress ────────────────────────────────────────────────────────────
+function confirmReset() {
+  progress={};
+  try { localStorage.removeItem(PROG_KEY); } catch(e) {}
+  document.getElementById('reset-overlay').classList.add('hidden');
+  renderSidebar();
+  // If viewing a module, re-open it to refresh done state
+  if (currentMod) openModule(currentMod.moduleId);
+}
+
+// ── Download / copy ───────────────────────────────────────────────────────────
+function downloadCode() {
+  const code=document.getElementById('code-input').value;
+  if(!code.trim()){ alert('Nothing to download — paste your code first.'); return; }
+  const ext=currentLang==='python'?'py':currentLang==='r'?'R':'do';
+  const name=(currentMod?currentMod.moduleId:'solution')+'.'+ext;
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([code],{type:'text/plain'}));
+  a.download=name; a.click();
+}
+function clearPractice() {
+  document.getElementById('code-input').value='';
+  document.getElementById('output-input').value='';
+}
+function copyFeedback() {
+  if(!lastFeedbackText) return;
+  navigator.clipboard.writeText(lastFeedbackText).then(()=>{
+    const btn=document.getElementById('copy-fb-btn');
+    const orig=btn.textContent; btn.textContent='Copied!';
+    setTimeout(()=>btn.textContent=orig,1800);
+  });
+}
+function showCriteria() {
+  const ll=currentLang==='python'?'Python':currentLang==='r'?'R':'Stata';
+  document.getElementById('criteria-text').textContent=SYSTEM_PROMPT(ll);
+  document.getElementById('criteria-overlay').classList.remove('hidden');
+}
+
+// ── View helpers ──────────────────────────────────────────────────────────────
+function showWelcome() {
+  document.getElementById('welcome').style.display='block';
+  document.getElementById('session').className='session';
+}
+function showSession() {
+  document.getElementById('welcome').style.display='none';
+  document.getElementById('session').className='session visible';
+}
+function goBack() { currentMod=null; showWelcome(); renderSidebar(); }
+
+// ── Markdown ──────────────────────────────────────────────────────────────────
+function md(txt) {
+  return txt
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/```[\w]*\n([\s\S]*?)```/g,'<pre>$1</pre>')
+    .replace(/`([^`\n]+)`/g,'<code>$1</code>')
+    .replace(/\*\*([^*\n]+)\*\*/g,'<strong>$1</strong>')
+    .replace(/^#{1,3} (.+)$/gm,'<h3>$1</h3>')
+    .replace(/^\d+\. (.+)$/gm,'<p style="margin-left:1em;margin-top:5px">$1</p>')
+    .replace(/^[-•*] (.+)$/gm,'<p style="margin-left:1em;margin-top:5px">• $1</p>')
+    .replace(/\n\n+/g,'<br><br>').replace(/\n/g,'<br>');
+}
+
+// ── API key modal ─────────────────────────────────────────────────────────────
+function openModal() {
+  document.getElementById('modal-overlay').classList.remove('hidden');
+  document.getElementById('api-key-input').value=apiKey;
+  const has=!!localStorage.getItem(KEY_STOR);
+  document.getElementById('remember-key').checked=has;
+  document.getElementById('clear-key-btn').style.display=has?'':'none';
+  setTimeout(()=>document.getElementById('api-key-input').focus(),50);
+}
+function closeModal() { document.getElementById('modal-overlay').classList.add('hidden'); }
+function saveKey() {
+  const val=document.getElementById('api-key-input').value.trim();
+  if(!val){ closeModal(); return; }
+  apiKey=val;
+  if(document.getElementById('remember-key').checked) {
+    try { localStorage.setItem(KEY_STOR,val); } catch(e) {}
+  } else { localStorage.removeItem(KEY_STOR); }
+  document.getElementById('api-badge').className='api-badge connected';
+  document.getElementById('api-label').textContent='Key set';
+  closeModal();
+}
+function clearKey() {
+  localStorage.removeItem(KEY_STOR); apiKey='';
+  document.getElementById('api-key-input').value='';
+  document.getElementById('remember-key').checked=false;
+  document.getElementById('clear-key-btn').style.display='none';
+  document.getElementById('api-badge').className='api-badge';
+  document.getElementById('api-label').textContent='No key';
+  closeModal();
+}
+document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
+document.getElementById('criteria-overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)document.getElementById('criteria-overlay').classList.add('hidden');});
+document.getElementById('reset-overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)document.getElementById('reset-overlay').classList.add('hidden');});
+document.getElementById('api-key-input').addEventListener('keydown',e=>{if(e.key==='Enter')saveKey();});
+
+boot();
+</script>
+</body>
+</html>
