@@ -966,7 +966,14 @@ function updateCoverWatchout() {
   });
 })();
 
-boot();
+
+(function(){
+  var p=new URLSearchParams(location.search);
+  var l=p.get("lang"),m=p.get("module"),f=p.get("from");
+  if(l&&window.CURRICULUM&&window.CURRICULUM[l]){currentLang=l;try{localStorage.setItem("qst_lang_v1",l);}catch(e){}switchLang(l);}
+  if(m)setTimeout(function(){openModule(m);},200);
+  if(f==="advisor"){var b=document.getElementById("advisor-banner");if(b){var ctx=null;try{var r=localStorage.getItem("qst_advisor_session_v1");if(r)ctx=JSON.parse(r);}catch(e){}var t=ctx?"From Advisor: "+(ctx.study||"")+" · "+(ctx.method||m):"From Advisor: "+(l||"").toUpperCase()+" · "+(m||"").replace(/_/g," ");document.getElementById("advisor-banner-text").textContent=t;b.style.display="flex";}}
+})();boot();
 </script>
 </body>
 </html>
