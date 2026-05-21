@@ -348,6 +348,12 @@ footer a:hover{color:var(--text2);}
 .module-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
 
 .personalised-badge{display:block;text-align:center;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:500;color:var(--lang);border:.5px solid var(--lang);border-radius:4px;padding:4px 12px;margin:0 auto 16px;opacity:.8;width:fit-content}.personalised-divider{border:none;border-top:.5px solid var(--rule,#e2e8f0);margin:0 0 16px}
+
+.tier-head{cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between}
+.tier-head::after{content:'−';font-size:14px;color:var(--lang);opacity:.6;transition:transform .2s}
+.tier-head.collapsed::after{content:'+'}
+.tier-modules{overflow:hidden;transition:max-height .25s ease}
+.tier-modules.collapsed{max-height:0!important}
 </style>
 </head>
 <body>
@@ -667,8 +673,38 @@ function renderSidebar() {
   document.getElementById('prog-fill').style.width = (allMods.length ? done/allMods.length*100 : 0) + '%';
   const suf = currentLang==='python'?'py':currentLang==='r'?'r':'stata';
   const list = document.getElementById('module-list'); list.innerHTML = '';
-  tiers.forEach(tier => {
-    const h = document.createElement('div'); h.className='tier-head'; h.textContent=tier.tier; list.appendChild(h);
+
+  // Find which tier contains the active module
+  let activeTier = tiers[0].tier;
+  if (currentMod) {
+    tiers.forEach(tier => {
+      if (tier.modules.find(m => m.id === currentMod.moduleId)) activeTier = tier.tier;
+    });
+  }
+
+  tiers.forEach((tier, tidx) => {
+    const isActiveTier = tier.tier === activeTier;
+
+    // Tier header
+    const h = document.createElement('div');
+    h.className = 'tier-head' + (isActiveTier ? '' : ' collapsed');
+    h.textContent = tier.tier;
+    h.onclick = () => {
+      h.classList.toggle('collapsed');
+      mods.classList.toggle('collapsed');
+      if (!mods.classList.contains('collapsed')) {
+        mods.style.maxHeight = mods.scrollHeight + 'px';
+      } else {
+        mods.style.maxHeight = '0';
+      }
+    };
+    list.appendChild(h);
+
+    // Module container
+    const mods = document.createElement('div');
+    mods.className = 'tier-modules' + (isActiveTier ? '' : ' collapsed');
+    mods.style.maxHeight = isActiveTier ? '2000px' : '0';
+
     tier.modules.forEach(mod => {
       const isDone=!!progress[mod.id], isActive=currentMod&&currentMod.moduleId===mod.id;
       const el=document.createElement('div');
@@ -678,8 +714,9 @@ function renderSidebar() {
       dot.className='mod-indicator'+(isDone?' done':(isActive?' current':''));
       const txt=document.createElement('div'); txt.className='mod-text';
       txt.innerHTML=`<div class="mod-name${isDone?' muted':''}">${mod.title}${isDone?' ✓':''}</div><div class="mod-desc">${mod.desc}</div>`;
-      el.appendChild(dot); el.appendChild(txt); list.appendChild(el);
+      el.appendChild(dot); el.appendChild(txt); mods.appendChild(el);
     });
+    list.appendChild(mods);
   });
 }
 
