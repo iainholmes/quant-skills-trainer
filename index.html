@@ -572,8 +572,8 @@ const PROG_KEY = 'qst_progress_v2';
 const LANG_KEY = 'qst_lang_v1';
 const KEY_STOR = 'qst_api_key_v1';
 
-const SYSTEM_PROMPT = (lang) =>
-`You are a senior econometrician reviewing a student's ${lang} code submission.
+const SYSTEM_PROMPT = (lang, advisorCtx) => {
+  const base = `You are a senior econometrician reviewing a student's ${lang} code submission.
 Structure your feedback in exactly three sections:
 
 **1. What's correct** — call out specific things done well (functions, logic, style, econometric choices)
@@ -583,6 +583,20 @@ Structure your feedback in exactly three sections:
 If the student has also provided printed output, assess whether it looks correct given the exercise requirements — flag any suspicious values, unexpected signs, or implausible magnitudes.
 
 Be direct and specific. Avoid generic praise. Keep total response to 250–400 words.`;
+
+  if (!advisorCtx) return base;
+
+  const ctx = `
+
+RESEARCH DESIGN CONTEXT (from the student's Econometric Advisor session):
+Study: ${advisorCtx.study || ''}
+Method: ${advisorCtx.method || ''}
+${advisorCtx.summary ? 'Details: ' + advisorCtx.summary : ''}
+
+Use this context to calibrate your feedback — assess whether their code is appropriate for their specific research design, flag any mismatches between the code and their stated identification strategy, and note if key steps recommended for their design are missing.`;
+
+  return base + ctx;
+};
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
 function boot() {
@@ -718,7 +732,13 @@ async function submitCode() {
   const fb=document.getElementById('feedback-out');
   fb.className='ai-box empty'; fb.textContent='Analysing your code…';
 
-  const system = SYSTEM_PROMPT(langLabel);
+  // Load Advisor session context if available
+  let advisorCtx = null;
+  try {
+    const raw = localStorage.getItem('qst_advisor_session_v1');
+    if (raw) advisorCtx = JSON.parse(raw);
+  } catch(e) {}
+  const system = SYSTEM_PROMPT(langLabel, advisorCtx);
   let userMsg = `Exercise:\n${exerciseRaw}\n\nStudent code:\n\`\`\`\n${code}\n\`\`\``;
   if (output) userMsg += `\n\nStudent's printed output:\n\`\`\`\n${output}\n\`\`\``;
 
