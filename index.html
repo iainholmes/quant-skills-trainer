@@ -81,7 +81,8 @@ header{background:var(--surface);border-bottom:1px solid var(--border);height:60
 .reset-btn:hover{color:#ef4444;}
 
 .module-list{overflow-y:auto;flex:1;padding:0.5rem 0 1.5rem;}
-.tier-head{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);padding:16px 20px 6px;}
+.tier-head{font-family:var(--sans);font-size:11.5px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:var(--lang);padding:20px 20px 6px;border-top:1px solid var(--lang-border);margin-top:4px;transition:color 0.3s,border-color 0.3s;}
+.tier-head:first-child{border-top:none;margin-top:0;padding-top:14px;}
 .mod-item{display:flex;align-items:flex-start;gap:12px;padding:10px 20px;cursor:pointer;transition:background 0.12s;border-left:2px solid transparent;}
 .mod-item:hover{background:var(--surface2);}
 .mod-item.active-py   {background:var(--py-light);   border-left-color:var(--py);}
