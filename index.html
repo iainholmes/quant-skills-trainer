@@ -347,7 +347,7 @@ footer a:hover{color:var(--text2);}
 .module-list::-webkit-scrollbar{width:5px;}
 .module-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
 
-.personalised-badge{display:inline-block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:500;color:var(--lang);border:.5px solid var(--lang);border-radius:4px;padding:3px 8px;margin-bottom:10px;opacity:.8}
+.personalised-badge{display:block;text-align:center;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:500;color:var(--lang);border:.5px solid var(--lang);border-radius:4px;padding:4px 12px;margin:0 auto 16px;opacity:.8;width:fit-content}.personalised-divider{border:none;border-top:.5px solid var(--rule,#e2e8f0);margin:0 0 16px}
 </style>
 </head>
 <body>
@@ -822,7 +822,7 @@ function personaliseExercise(mod) {
   }).then(function(res) { return res.json(); }).then(function(data) {
     var text = data.content && data.content[0] && data.content[0].text;
     if (text && text.length > 20) {
-      exerciseEl.innerHTML = '<div class="personalised-badge">&#10024; Personalised for your research design</div>' + text.replace(/\n/g, '<br>');
+      exerciseEl.innerHTML = '<div class="personalised-badge">&#10024; Personalised for your research design</div><hr class="personalised-divider">' + text.replace(/\n/g, '<br>');
     }
     exerciseEl.style.opacity = '1';
   }).catch(function() {
