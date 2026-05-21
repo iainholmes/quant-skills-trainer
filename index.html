@@ -515,6 +515,7 @@ footer a:hover{color:var(--text2);}
 
       <!-- Learn -->
       <div class="phase-panel visible" id="panel-learn">
+        <div id="focus-warning" style="display:none; background:#fff8e6; border:1px solid #fde68a; border-left:4px solid #f59e0b; padding:16px 20px; border-radius:8px; margin-bottom:1.5rem; font-size:14px; color:#92400e; box-shadow:0 2px 4px rgba(0,0,0,0.02); line-height:1.6;"></div>
         <div class="content-box" id="learn-out"></div>
       </div>
 
@@ -679,6 +680,7 @@ function openModule(modId) {
   document.getElementById('sess-pill').className    = `lang-pill pill-${suf}`;
   document.getElementById('sess-pill').textContent  = lbl;
   document.getElementById('learn-out').innerHTML    = mod.lesson;
+  const fw = document.getElementById('focus-warning'); if (fw) fw.style.display = 'none';
   document.getElementById('exercise-out').innerHTML = mod.exercise;
   const fb = document.getElementById('feedback-out');
   fb.className='ai-box empty'; fb.textContent='Submit your code in the Practice tab to receive feedback here.';
@@ -976,9 +978,21 @@ function updateCoverWatchout() {
 
 (function(){
   var p=new URLSearchParams(location.search);
-  var l=p.get("lang"),m=p.get("module"),f=p.get("from");
+  var l=p.get("lang"),m=p.get("module"),f=p.get("from"),focus=p.get("focus");
   setTimeout(function(){if(l&&typeof CURRICULUM!=="undefined"&&CURRICULUM[l]){switchLang(l);}if(m)setTimeout(function(){if(typeof openModule!=="undefined")openModule(m);},350);},400);
   if(f==="advisor"){var b=document.getElementById("advisor-banner");if(b){var ctx=null;try{var r=localStorage.getItem("qst_advisor_session_v1");if(r)ctx=JSON.parse(r);}catch(e){}var t=ctx?"From Advisor: "+(ctx.study||"")+" · "+(ctx.method||m):"From Advisor: "+(l||"").toUpperCase()+" · "+(m||"").replace(/_/g," ");document.getElementById("advisor-banner-text").textContent=t;b.style.display="flex";}}
+  if(focus){setTimeout(function(){
+    var warn=document.getElementById("focus-warning");
+    if(!warn)return;
+    var msg="";
+    if(["t_logit","t_probit"].includes(focus)) msg="<strong>Note: You are here to learn Binary Choice models (Logit/Probit).</strong> You have been routed to the foundational OLS module because the data-wrangling and formula syntax are identical. When writing your final code, remember to use the appropriate GLM function (e.g., <code>feglm(..., family=binomial('logit'))</code> or <code>statsmodels.Logit</code>) instead of standard OLS.";
+    else if(["t_poisson","t_tobit"].includes(focus)) msg="<strong>Note: You are here to learn Limited Dependent Variables (Count/Censored data).</strong> You have been routed to the foundational OLS module because the syntax framework is identical. For your final analysis, swap the base linear estimator for the appropriate count/censored model.";
+    else if(focus==="t_scm") msg="<strong>Note: You are here to learn Synthetic Control.</strong> You have been routed to the Difference-in-Differences module because SCM is conceptually related. SCM requires dedicated packages (like <code>synthdid</code> or <code>SyntheticControlMethods</code>) which are not covered here, but the data setup is similar.";
+    else if(focus==="t_sar") msg="<strong>Note: You are here to learn Spatial Econometrics.</strong> You have been routed to the Panel Data module to practice fixed effects and clustering. Spatial autoregressive models require explicit spatial weights matrices (W) and dedicated spatial packages.";
+    else if(focus==="t_cox") msg="<strong>Note: You are here to learn Survival Analysis (Cox PH).</strong> You have been routed to the Time Series module to practice temporal data structures. Survival analysis requires specialized functions (like <code>coxph</code> or <code>lifelines</code>) to handle hazard rates and censoring.";
+    else if(focus==="t_matching") msg="<strong>Note: You are here to learn Matching / PSM.</strong> You have been routed to the foundational OLS module. Matching is a pre-processing step used to balance covariates before running the regression models covered here.";
+    if(msg){warn.innerHTML=msg; warn.style.display="block";}
+  }, 450);}
 })();boot();
 </script>
 </body>
