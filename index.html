@@ -55,79 +55,126 @@ header{background:var(--surface);border-bottom:1px solid var(--border);height:60
 .modal-note a{color:var(--lang);text-decoration:none;}
 .criteria-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem 1.4rem;font-family:var(--mono);font-size:12px;line-height:1.75;color:var(--text2);margin-top:12px;white-space:pre-wrap;}
 
-/* Layout — sidebar overlays, main content fills full width */
-.layout{display:flex;flex:1;position:relative;}
+/* Layout — fixed sidebar, main fills rest */
+.layout{display:flex;flex:1;}
 
-/* ── Overlay sidebar drawer ─────────────────────────────────────── */
-/*
-  The sidebar sits in fixed position over the main content.
-  It collapses to a thin accent strip (6px) on the left.
-  On :hover it expands to full width as a floating drawer.
-  The main content always fills the full width — no layout shift.
-  All transitions are pure CSS — zero JS timers, zero lag.
-*/
+/* ── Sidebar — fixed width, never moves ─────────────────────────── */
 .sidebar{
-  position:sticky;
-  top:60px;
+  position:sticky;top:60px;
   height:calc(100vh - 60px);
-  flex-shrink:0;
+  width:280px;flex-shrink:0;
+  display:flex;flex-direction:column;
+  background:var(--surface);
+  border-right:2px solid var(--lang);
+  overflow:hidden;
+  box-shadow:inset -6px 0 16px rgba(0,0,0,0.04), 4px 0 14px rgba(0,0,0,0.06);
+  transition:border-color 0.3s;
+  z-index:50;
+}
+/* Subtle language tint */
+.sidebar::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:var(--lang-light);opacity:0.13;transition:background 0.3s;z-index:0;
+}
 
-  /* Collapsed: just the accent strip */
-  width:6px;
+/* Main column */
+.main-col{flex:1;min-width:0;background:var(--surface);position:relative;z-index:1;}
+
+/* ── Cover panel ─────────────────────────────────────────────────── */
+/*
+  Sits inside .sidebar, absolutely positioned, slides in from the right
+  when the user's mouse leaves the sidebar area. Full height, full width.
+  Background: language color at 85% opacity so module list ghosts through.
+  Zero JS timers — mouseenter/leave on the SIDEBAR triggers a class toggle.
+*/
+.sidebar-cover{
+  position:absolute;inset:0;
+  z-index:10;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:stretch;
   overflow:hidden;
 
-  background:var(--surface);
-  border-right:none;
-  z-index:50;
+  /* Slide in from right — transform is the animation axis */
+  transform:translateX(100%);
+  transition:transform 0.32s cubic-bezier(0.4,0,0.2,1);
 
-  /* Shadow only on the right edge — casts onto main content */
-  box-shadow: 3px 0 24px rgba(0,0,0,0.10),
-              1px 0 0 var(--lang);
+  /* Language color backdrop — set via JS inline style */
+  background:var(--cover-bg, rgba(46,125,50,0.85));
+  backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(3px);
+}
+/* When sidebar has .covered class, cover slides in */
+.sidebar.covered .sidebar-cover{transform:translateX(0);}
 
-  transition:
-    width 0.28s cubic-bezier(0.4,0,0.2,1),
-    box-shadow 0.28s ease;
+/* Top half — logo area */
+.cover-top{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:14px;
+  padding:2rem 1.5rem;
+}
+/* Logo SVG and wordmark fade in after 15s — hidden by default */
+.cover-logo-wrap{
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+  opacity:0;transition:opacity 0.8s ease;
+}
+.sidebar.logo-visible .cover-logo-wrap{opacity:1;}
+
+.cover-logo-svg{width:56px;height:56px;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.18));}
+.cover-logo-name{
+  font-family:var(--mono);font-size:11px;font-weight:500;
+  letter-spacing:0.12em;text-transform:uppercase;
+  color:rgba(255,255,255,0.9);text-align:center;
 }
 
-/* Accent strip — the visible sliver when collapsed */
-.sidebar::before{
-  content:'';
-  position:absolute;
-  left:0;top:0;bottom:0;
-  width:6px;
-  background:var(--lang);
-  transition:background 0.3s;
-  z-index:2;
-  border-radius:0 3px 3px 0;
+/* Progress ring */
+.cover-ring-wrap{
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  opacity:0;transition:opacity 0.8s ease 0.1s;
+}
+.sidebar.logo-visible .cover-ring-wrap{opacity:1;}
+.cover-ring-label{
+  font-family:var(--mono);font-size:11px;letter-spacing:0.06em;
+  color:rgba(255,255,255,0.75);text-transform:uppercase;text-align:center;
+}
+.cover-ring-sub{
+  font-family:var(--mono);font-size:10px;
+  color:rgba(255,255,255,0.55);text-align:center;
 }
 
-/* Hover — drawer slides out over main content */
-.sidebar:hover{
-  width:280px;
-  box-shadow: 6px 0 40px rgba(0,0,0,0.14),
-              1px 0 0 var(--lang);
+/* Dividing line */
+.cover-divider{
+  width:calc(100% - 3rem);height:1px;
+  background:rgba(255,255,255,0.25);
+  flex-shrink:0;
+  opacity:0;transition:opacity 0.8s ease 0.15s;
 }
+.sidebar.logo-visible .cover-divider{opacity:1;}
 
-/* Language-tint overlay inside the drawer */
-.sidebar::after{
-  content:'';
-  position:absolute;inset:0;
-  pointer-events:none;
-  background:var(--lang-light);
-  opacity:0.12;
-  transition:background 0.3s;
-  z-index:1;
+/* Bottom half — watch-out area */
+.cover-bottom{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:2rem 1.5rem;gap:10px;
+  opacity:0;transition:opacity 0.8s ease 0.2s;
 }
-
-/* Main column — full width, sits behind sidebar */
-.main-col{
-  flex:1;
-  min-width:0;
-  background:var(--surface);
-  position:relative;
-  z-index:1;
-  /* Subtle left indent so content doesn't hide behind the 6px strip */
-  padding-left:6px;
+.sidebar.logo-visible .cover-bottom{opacity:1;}
+.cover-watchout-label{
+  font-family:var(--mono);font-size:10px;font-weight:500;
+  letter-spacing:0.1em;text-transform:uppercase;
+  color:rgba(255,255,255,0.6);
+  align-self:flex-start;
+  display:flex;align-items:center;gap:6px;
+}
+.cover-watchout-label::before{content:'⚠';font-size:11px;}
+.cover-watchout-text{
+  font-family:var(--sans);font-size:13px;line-height:1.6;
+  color:rgba(255,255,255,0.88);
+  font-style:italic;
+}
+.cover-no-module{
+  font-family:var(--mono);font-size:12px;
+  color:rgba(255,255,255,0.45);text-align:center;
+  letter-spacing:0.03em;
 }
 
 /* Lang tabs */
@@ -355,6 +402,54 @@ footer a:hover{color:var(--text2);}
 
 <div class="layout" id="layout">
   <aside class="sidebar" id="sidebar">
+
+    <!-- Cover panel — slides over sidebar on idle -->
+    <div class="sidebar-cover" id="sidebar-cover">
+      <div class="cover-top">
+        <!-- Progress ring (visible immediately when cover opens) -->
+        <div class="cover-ring-wrap" id="cover-ring-wrap">
+          <svg class="cover-ring-svg" id="cover-ring-svg" width="80" height="80" viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="6"/>
+            <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="6"
+              stroke-linecap="round"
+              stroke-dasharray="201" stroke-dashoffset="201"
+              id="cover-ring-arc"
+              transform="rotate(-90 40 40)"/>
+            <text x="40" y="36" text-anchor="middle" font-family="DM Mono,monospace" font-size="13" fill="rgba(255,255,255,0.9)" font-weight="500" id="cover-ring-num">0</text>
+            <text x="40" y="50" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="rgba(255,255,255,0.55)" letter-spacing="1">DONE</text>
+          </svg>
+          <div class="cover-ring-label" id="cover-ring-label">0 of 0 modules</div>
+        </div>
+        <!-- Logo — fades in after 15s -->
+        <div class="cover-logo-wrap" id="cover-logo-wrap">
+          <svg class="cover-logo-svg" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+            <rect width="56" height="56" rx="12" fill="rgba(0,0,0,0.2)"/>
+            <circle cx="18" cy="28" r="6" fill="rgba(255,255,255,0.9)"/>
+            <circle cx="33" cy="18" r="6" fill="rgba(255,255,255,0.7)"/>
+            <circle cx="33" cy="38" r="6" fill="rgba(255,255,255,0.55)"/>
+            <line x1="24" y1="25.5" x2="27.5" y2="20.5" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round"/>
+            <line x1="24" y1="30.5" x2="27.5" y2="35.5" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <div class="cover-logo-name">Quant Skills<br>Trainer</div>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div class="cover-divider" id="cover-divider"></div>
+
+      <!-- Bottom — watch-out for active module -->
+      <div class="cover-bottom" id="cover-bottom">
+        <div id="cover-bottom-inner">
+          <div class="cover-no-module" id="cover-no-module">Select a module<br>to begin</div>
+          <div style="display:none;" id="cover-watchout-block">
+            <div class="cover-watchout-label">Watch out</div>
+            <p class="cover-watchout-text" id="cover-watchout-text"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /cover panel -->
+
     <div class="lang-tabs">
       <button class="lang-tab" id="tab-py"    onclick="switchLang('python')">Python</button>
       <button class="lang-tab" id="tab-r"     onclick="switchLang('r')">R</button>
@@ -766,6 +861,110 @@ document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.targe
 document.getElementById('criteria-overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)document.getElementById('criteria-overlay').classList.add('hidden');});
 document.getElementById('reset-overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)document.getElementById('reset-overlay').classList.add('hidden');});
 document.getElementById('api-key-input').addEventListener('keydown',e=>{if(e.key==='Enter')saveKey();});
+
+// ── Cover panel ───────────────────────────────────────────────────────────────
+const COVER_COLORS = {
+  python: 'rgba(46,125,50,0.86)',
+  r:      'rgba(46,82,194,0.86)',
+  stata:  'rgba(91,143,185,0.86)',
+};
+
+let coverTimer    = null;  // grace period before sliding cover in
+let logoTimer     = null;  // 15s delay before logo appears
+let coverIsOpen   = false;
+
+function openCover() {
+  if (coverIsOpen) return;
+  coverIsOpen = true;
+  const sidebar = document.getElementById('sidebar');
+  const cover   = document.getElementById('sidebar-cover');
+
+  // Set language colour
+  cover.style.background = COVER_COLORS[currentLang] || COVER_COLORS.python;
+
+  // Update progress ring
+  updateCoverRing();
+
+  // Update watch-out
+  updateCoverWatchout();
+
+  sidebar.classList.add('covered');
+
+  // Start 15s logo timer
+  clearTimeout(logoTimer);
+  logoTimer = setTimeout(() => {
+    sidebar.classList.add('logo-visible');
+  }, 15000);
+}
+
+function closeCover() {
+  if (!coverIsOpen) return;
+  coverIsOpen = false;
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.remove('covered');
+  sidebar.classList.remove('logo-visible');
+  clearTimeout(logoTimer);
+}
+
+function updateCoverRing() {
+  const tiers   = CURRICULUM[currentLang]; if (!tiers) return;
+  const allMods = tiers.flatMap(t => t.modules);
+  const total   = allMods.length;
+  const done    = allMods.filter(m => progress[m.id]).length;
+  const pct     = total ? done / total : 0;
+  const circ    = 2 * Math.PI * 32; // r=32, circumference ≈ 201
+
+  document.getElementById('cover-ring-arc').style.strokeDashoffset = circ * (1 - pct);
+  document.getElementById('cover-ring-num').textContent  = done;
+  document.getElementById('cover-ring-label').textContent = `${done} of ${total} modules complete`;
+}
+
+function updateCoverWatchout() {
+  const noMod  = document.getElementById('cover-no-module');
+  const block  = document.getElementById('cover-watchout-block');
+  const text   = document.getElementById('cover-watchout-text');
+
+  if (!currentMod) {
+    noMod.style.display  = '';
+    block.style.display  = 'none';
+    return;
+  }
+
+  // Find the module
+  const tiers = CURRICULUM[currentLang]; let mod = null;
+  for (const tier of tiers) { mod = tier.modules.find(m => m.id === currentMod.moduleId); if (mod) break; }
+  if (!mod) { noMod.style.display=''; block.style.display='none'; return; }
+
+  // Extract watch-out text — strip all HTML tags, trim
+  const watchout = (mod.lesson.match(/<div class="watchout">([\s\S]*?)<\/div>/)?.[1] || '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/Watch out:\s*/i, '')
+    .trim();
+
+  if (watchout) {
+    noMod.style.display  = 'none';
+    block.style.display  = '';
+    text.textContent     = watchout;
+  } else {
+    noMod.style.display  = '';
+    block.style.display  = 'none';
+  }
+}
+
+// Wire up mouse events on the sidebar
+(function() {
+  const sidebar = document.getElementById('sidebar');
+
+  sidebar.addEventListener('mouseleave', () => {
+    clearTimeout(coverTimer);
+    coverTimer = setTimeout(openCover, 500);
+  });
+
+  sidebar.addEventListener('mouseenter', () => {
+    clearTimeout(coverTimer);
+    closeCover();
+  });
+})();
 
 boot();
 </script>
