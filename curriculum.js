@@ -16,6 +16,13 @@ const CURRICULUM = {
           desc: 'Linear regression, robust SEs, and formula API',
           lesson: '<h3>Overview</h3><p>statsmodels is the primary library for econometric modeling in Python.</p>',
           exercise: 'Run a standard OLS regression.'
+        },
+        {
+          id: 'py_iv',
+          title: 'Instrumental Variables',
+          desc: 'Handling endogeneity using two-stage least squares',
+          lesson: '<h3>Overview</h3><p>Use IV when your treatment is correlated with the error term.</p>',
+          exercise: 'Estimate a 2SLS model.'
         }
       ]
     }
