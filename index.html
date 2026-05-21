@@ -589,7 +589,7 @@ function boot() {
   const saved = localStorage.getItem(LANG_KEY);
   if (saved && CURRICULUM[saved]) currentLang = saved;
 
-  const savedKey = localStorage.getItem(KEY_STOR);
+  const savedKey = localStorage.getItem(KEY_STOR) || localStorage.getItem('ea_ak');
   if (savedKey) {
     apiKey = savedKey;
     document.getElementById('api-badge').className = 'api-badge connected';
