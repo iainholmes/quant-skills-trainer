@@ -775,7 +775,7 @@ lwage = (1.5 + 0.20*d + X @ beta_x * 0.5
 <li><strong>4.</strong> Which estimate is closest to the true effect of 0.20? Explain why DML is preferred.</li>
 </ul>
 <p><strong>Expected output:</strong> Naive OLS biased; DML estimate ~0.20; written comparison of the three approaches.</p>`
-      },,
+      },
       {
         id: "glm_bridge",
         title: "GLM Bridge — Logit, Poisson & Tobit",
@@ -1534,7 +1534,7 @@ child_dev <- (60 - 0.3*(poverty_rate - 59.2) + 5*eligible
 <li><strong>4.</strong> Run the estimator at bandwidths h=5 and h=15 (use <code>h=</code> argument). How sensitive is the estimate?</li>
 </ul>
 <p><strong>Expected output:</strong> rdplot with visible jump; main estimate ~5; rddensity non-significant; bandwidth sensitivity table.</p>`
-      },,
+      },
       {
         id: "glm_bridge",
         title: "GLM Bridge — Logit, Poisson & Tobit",
@@ -2280,7 +2280,7 @@ gen earnings   = 25000 + 8000*scholarship + 400*(score-70) + rnormal(0,3000)</pr
 <li><strong>4.</strong> Run <code>rddensity score, c(70)</code>. Interpret the result — is there evidence of manipulation?</li>
 </ul>
 <p><strong>Expected output:</strong> rdplot with clear jump at 70; rdrobust estimate ~8000; bandwidth robustness; rddensity interpretation.</p>`
-      },,
+      },
       {
         id: "glm_bridge",
         title: "GLM Bridge — Logit, Poisson & Tobit",
