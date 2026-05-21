@@ -357,7 +357,35 @@ footer a:hover{color:var(--text2);}
 @keyframes spin{to{transform:rotate(360deg);}}
 .module-list::-webkit-scrollbar{width:5px;}
 .module-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
-</style>
+/* Advisor integration banner */
+.advisor-banner{
+  display:none;align-items:center;gap:12px;
+  padding:10px 2rem;
+  background:linear-gradient(90deg, var(--lang-light), var(--surface));
+  border-bottom:1px solid var(--lang-border);
+  font-family:var(--mono);font-size:11px;color:var(--text2);
+  letter-spacing:0.03em;
+  position:relative;z-index:99;
+  transition:background 0.3s;
+}
+.advisor-banner-pip{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--lang);flex-shrink:0;
+}
+.advisor-banner-text{flex:1;}
+.advisor-banner-link{
+  color:var(--lang);text-decoration:none;font-weight:500;
+  border-bottom:1px solid var(--lang-border);
+  transition:border-color 0.14s;white-space:nowrap;
+}
+.advisor-banner-link:hover{border-bottom-color:var(--lang);}
+.advisor-banner-dismiss{
+  background:none;border:none;cursor:pointer;
+  color:var(--text3);font-size:14px;padding:0 4px;
+  transition:color 0.14s;
+}
+.advisor-banner-dismiss:hover{color:var(--text);}
+
 </head>
 <body>
 
@@ -370,6 +398,14 @@ footer a:hover{color:var(--text2);}
     <button class="btn-sm" onclick="openModal()">Set API key</button>
   </div>
 </header>
+
+<!-- Advisor integration banner — shown when arriving via deep-link -->
+<div class="advisor-banner" id="advisor-banner">
+  <div class="advisor-banner-pip"></div>
+  <span class="advisor-banner-text" id="advisor-banner-text"></span>
+  <a class="advisor-banner-link" href="https://iainholmes.github.io/econometric-advisor/" target="_blank">← Back to Advisor</a>
+  <button class="advisor-banner-dismiss" onclick="dismissAdvisorBanner()" title="Dismiss">✕</button>
+</div>
 
 <!-- API Key Modal -->
 <div class="overlay hidden" id="modal-overlay">
@@ -575,17 +611,35 @@ const PROG_KEY = 'qst_progress_v2';
 const LANG_KEY = 'qst_lang_v1';
 const KEY_STOR = 'qst_api_key_v1';
 
-const SYSTEM_PROMPT = (lang) =>
+const ADVISOR_KEY = 'qst_advisor_session_v1'; // shared with Advisor app
+
+const SYSTEM_PROMPT = (lang, advisorCtx) => {
+  const base =
 `You are a senior econometrician reviewing a student's ${lang} code submission.
 Structure your feedback in exactly three sections:
 
-**1. What's correct** — call out specific things done well (functions, logic, style, econometric choices)
-**2. Issues & improvements** — identify concrete problems; reference actual variable names, functions, or line patterns from their code
+**1. What's correct** — specific things done well (functions, logic, style, econometric choices)
+**2. Issues & improvements** — concrete problems; reference actual variable names or functions from their code
 **3. Key insight** — the single most important econometric or coding concept illustrated by this exercise
 
-If the student has also provided printed output, assess whether it looks correct given the exercise requirements — flag any suspicious values, unexpected signs, or implausible magnitudes.
+If the student provided printed output, check whether it looks correct — flag suspicious values, unexpected signs, or implausible magnitudes.
 
 Be direct and specific. Avoid generic praise. Keep total response to 250–400 words.`;
+
+  if (!advisorCtx) return base;
+
+  return base + `
+
+── Advisor context ──
+This student used the Econometric Advisor to design their study before coming here.
+Their research design:
+${advisorCtx}
+
+Use this context to:
+- Check whether their code actually implements the design they planned (flag specification drift)
+- Note if their clustering level, FE structure, or instrument usage matches what they specified
+- If something differs from their stated design, flag it explicitly under Issues & improvements`;
+};
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
 function boot() {
@@ -602,15 +656,40 @@ function boot() {
     document.getElementById('clear-key-btn').style.display = '';
   }
 
-  // Dynamically populate welcome card counts
   Object.entries(CURRICULUM).forEach(([lang, tiers]) => {
     const total = tiers.flatMap(t => t.modules).length;
     const el = document.getElementById('wc-' + (lang === 'python' ? 'py' : lang));
     if (el) el.textContent = total + ' modules';
   });
 
+  // ── Deep-link from Advisor ──────────────────────────────────────
+  const params = new URLSearchParams(window.location.search);
+  const pLang  = params.get('lang');   // 'python' | 'r' | 'stata'
+  const pMod   = params.get('module'); // e.g. 'py_iv'
+  const pFrom  = params.get('from');   // 'advisor'
+
+  if (pLang && CURRICULUM[pLang]) currentLang = pLang;
+
   applyLang(currentLang);
   renderSidebar();
+
+  // If deep-linked to a specific module, open it after a short paint delay
+  if (pMod) {
+    setTimeout(() => {
+      const tiers = CURRICULUM[currentLang];
+      let found = false;
+      for (const tier of tiers) {
+        if (tier.modules.find(m => m.id === pMod)) { found = true; break; }
+      }
+      if (found) {
+        switchLang(currentLang); // ensure sidebar renders for this lang
+        openModule(pMod);
+      }
+    }, 120);
+  }
+
+  // Show Advisor banner if arriving from Advisor
+  if (pFrom === 'advisor') showAdvisorBanner();
 
   document.getElementById('code-input').addEventListener('keydown', e => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); submitCode(); }
@@ -715,13 +794,20 @@ async function submitCode() {
   const langLabel = currentLang==='python'?'Python':currentLang==='r'?'R':'Stata';
   const exerciseRaw = (mod?mod.exercise:'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
 
+  // Load Advisor session context if available
+  let advisorCtx = null;
+  try {
+    const raw = localStorage.getItem(ADVISOR_KEY);
+    if (raw) advisorCtx = JSON.parse(raw).summary || null;
+  } catch(e) {}
+
   const btn=document.getElementById('submit-btn'), inner=document.getElementById('submit-inner');
   btn.disabled=true; inner.innerHTML='<span class="spin"></span> Reviewing…';
   switchPhase('feedback');
   const fb=document.getElementById('feedback-out');
   fb.className='ai-box empty'; fb.textContent='Analysing your code…';
 
-  const system = SYSTEM_PROMPT(langLabel);
+  const system = SYSTEM_PROMPT(langLabel, advisorCtx);
   let userMsg = `Exercise:\n${exerciseRaw}\n\nStudent code:\n\`\`\`\n${code}\n\`\`\``;
   if (output) userMsg += `\n\nStudent's printed output:\n\`\`\`\n${output}\n\`\`\``;
 
@@ -811,8 +897,41 @@ function copyFeedback() {
 }
 function showCriteria() {
   const ll=currentLang==='python'?'Python':currentLang==='r'?'R':'Stata';
-  document.getElementById('criteria-text').textContent=SYSTEM_PROMPT(ll);
+  let advisorCtx = null;
+  try { const r=localStorage.getItem(ADVISOR_KEY); if(r) advisorCtx=JSON.parse(r).summary||null; } catch(e){}
+  document.getElementById('criteria-text').textContent=SYSTEM_PROMPT(ll, advisorCtx);
   document.getElementById('criteria-overlay').classList.remove('hidden');
+}
+
+// ── Advisor integration ───────────────────────────────────────────────────────
+function showAdvisorBanner() {
+  const banner = document.getElementById('advisor-banner');
+  if (!banner) return;
+
+  // Try localStorage first for rich context; fall back to URL params alone
+  let ctx = null;
+  try { const r=localStorage.getItem(ADVISOR_KEY); if(r) ctx=JSON.parse(r); } catch(e){}
+
+  const params = new URLSearchParams(window.location.search);
+  const modParam = params.get('module') || '';
+  const langParam = params.get('lang') || '';
+
+  let bannerText;
+  if (ctx) {
+    const method = ctx.method || modParam.replace(/_/g,' ') || 'your recommended method';
+    bannerText = `Arrived from Econometric Advisor · Study: ${ctx.study||'your research design'} · Method: ${method}`;
+  } else {
+    // No localStorage yet — build from URL params
+    bannerText = `Arrived from Econometric Advisor · ${langParam ? langParam.toUpperCase() : ''} · ${modParam.replace(/_/g,' ') || 'recommended module'}`;
+  }
+
+  document.getElementById('advisor-banner-text').textContent = bannerText;
+  banner.style.display = 'flex';
+}
+
+function dismissAdvisorBanner() {
+  const b = document.getElementById('advisor-banner');
+  if (b) b.style.display = 'none';
 }
 
 // ── View helpers ──────────────────────────────────────────────────────────────
