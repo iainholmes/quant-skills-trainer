@@ -656,10 +656,36 @@ function boot() {
 
 // ── Language ──────────────────────────────────────────────────────────────────
 function switchLang(lang) {
+  // Try to stay on equivalent module in new language
+  var prevModId = currentMod ? currentMod.moduleId : null;
   currentLang = lang;
   localStorage.setItem(LANG_KEY, lang);
   currentMod = null;
   applyLang(lang);
+
+  if (prevModId) {
+    // Map prefix: r_ → py_ → st_ and glm_bridge stays the same
+    var prefixMap = {'r':'r_','python':'py_','stata':'st_'};
+    var newPrefix = prefixMap[lang];
+    var suffix = prevModId.replace(/^(r_|py_|st_)/, '');
+    var newModId = prevModId === 'glm_bridge' ? 'glm_bridge' : newPrefix + suffix;
+    // Check if equivalent module exists
+    var tiers = CURRICULUM[lang];
+    var found = false;
+    if (tiers) {
+      for (var i=0; i<tiers.length; i++) {
+        if (tiers[i].modules.find(function(m){return m.id===newModId;})) {
+          found = true; break;
+        }
+      }
+    }
+    if (found) {
+      renderSidebar();
+      openModule(newModId);
+      return;
+    }
+  }
+
   showWelcome();
   renderSidebar();
 }
