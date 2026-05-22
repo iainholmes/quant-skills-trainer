@@ -1563,6 +1563,53 @@ child_dev <- (60 - 0.3*(poverty_rate - 59.2) + 5*eligible
 <p><strong>Expected output:</strong> rdplot with visible jump; main estimate ~5; rddensity non-significant; bandwidth sensitivity table.</p>`
       },
       {
+        id: "r_ml",
+        title: "Machine learning for causal inference in R",
+        concepts: ["LASSO via glmnet selects controls in high-dimensional settings", "Double ML partials out treatment and outcome on controls using cross-fitting", "The grf package estimates heterogeneous treatment effects via causal forests", "Honest splitting in causal forests separates tree-building from effect estimation"],
+        desc: "LASSO, Double ML, causal forests with grf",
+        lesson: `<h3>Overview</h3>
+<p>R's ML-for-causal-inference toolkit centres on two packages: <code>glmnet</code> for penalised regression and variable selection, and <code>grf</code> (Generalized Random Forests) for heterogeneous treatment effect estimation. The key discipline is using these tools for nuisance estimation while preserving valid inference on causal parameters.</p>
+<h3>Key concepts</h3>
+<ul>
+<li><strong>glmnet / cv.glmnet</strong>: LASSO and Ridge regression — <code>cv.glmnet</code> selects the penalty lambda by cross-validation.</li>
+<li><strong>Double ML (DoubleML package)</strong>: partials out both Y and D on high-dimensional X using ML learners with cross-fitting. Neyman-orthogonal moment conditions ensure valid inference.</li>
+<li><strong>causal_forest (grf)</strong>: builds an ensemble of regression trees that maximise treatment effect heterogeneity. Produces point estimates and confidence intervals for each unit.</li>
+<li><strong>Honest splitting</strong>: uses separate subsamples for tree structure and effect estimation — prevents overfitting from inflating apparent heterogeneity.</li>
+<li><strong>variable_importance()</strong>: ranks covariates by how often they drive splits — useful for interpreting which variables moderate treatment effects.</li>
+</ul>
+<h3>Worked example — Double ML in R</h3>
+<pre>library(DoubleML); library(mlr3); library(mlr3learners); library(data.table)
+set.seed(42)
+n <- 500; p <- 20
+X <- matrix(rnorm(n*p), n, p)
+d <- X[,1] + X[,2] + rnorm(n)          # treatment
+y <- 2.0*d + X %*% rnorm(p, 0, 0.5) + rnorm(n)
+
+df <- data.table(y=y, d=d, X)
+dml_data <- DoubleMLData$new(df, y_col="y", d_cols="d")
+
+lasso <- lrn("regr.cv_glmnet")
+dml <- DoubleMLPLR$new(dml_data, ml_l=lasso$clone(), ml_m=lasso$clone())
+dml$fit()
+dml$summary()   # coefficient ~2.0</pre>
+<div class="watchout"><strong>Watch out:</strong> DoubleML requires mlr3 learners. Always clone learners before passing to ml_l and ml_m — sharing a single learner object causes fitting errors. Use <code>set.seed()</code> before <code>$fit()</code> for reproducibility.</div>`,
+        exercise: `<h3>Exercise — Causal Forest</h3>
+<p><strong>Scenario:</strong> Estimate heterogeneous treatment effects of a job training programme on log wages using a causal forest.</p>
+<pre>library(grf); set.seed(123)
+n <- 1000
+X <- matrix(rnorm(n*10), n, 10)
+W <- rbinom(n, 1, 0.5)                      # random treatment
+tau <- 0.5 + 0.8*(X[,1] > 0)               # true HTE
+Y <- 0.5*W*tau + X[,1] + rnorm(n, 0, 0.5)</pre>
+<ul>
+<li><strong>1.</strong> Fit a causal forest: <code>cf <- causal_forest(X, Y, W, num.trees=2000)</code>.</li>
+<li><strong>2.</strong> Extract unit-level treatment effect estimates with <code>predict(cf)$predictions</code>. Plot a histogram.</li>
+<li><strong>3.</strong> Run <code>average_treatment_effect(cf)</code>. Report the ATE and its standard error.</li>
+<li><strong>4.</strong> Run <code>variable_importance(cf)</code>. Which covariate drives heterogeneity most? Does it match the DGP?</li>
+</ul>
+<p><strong>Expected output:</strong> ATE ~0.9; X1 ranked highest in variable importance; histogram showing two clusters of treatment effects.</p>`
+      },
+      {
         id: "glm_bridge",
         title: "GLM Bridge — Logit, Poisson & Tobit",
         concepts: ["OLS is inconsistent for binary, count, and censored outcomes", "Logit models log-odds; always report Average Marginal Effects, not raw coefficients", "Poisson assumes mean equals variance \u2014 test for overdispersion before using", "Tobit models the latent continuous variable when outcomes are censored at a limit"],
