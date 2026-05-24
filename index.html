@@ -716,6 +716,16 @@ function renderSidebar() {
   document.getElementById('prog-label').textContent = `${done} / ${allMods.length}`;
   document.getElementById('prog-fill').style.width = (allMods.length ? done/allMods.length*100 : 0) + '%';
   const suf = currentLang==='python'?'py':currentLang==='r'?'r':'stata';
+  // Populate welcome screen module counts
+  ['python','r','stata'].forEach(lang => {
+    const cur = CURRICULUM[lang];
+    if (!cur) return;
+    const count = cur.reduce((acc, tier) => acc + tier.modules.length, 0);
+    const id = lang === 'python' ? 'wc-py' : lang === 'r' ? 'wc-r' : 'wc-stata';
+    const el = document.getElementById(id);
+    if (el) el.textContent = count + ' modules';
+  });
+
   const list = document.getElementById('module-list'); list.innerHTML = '';
 
   // Find which tier contains the active module
