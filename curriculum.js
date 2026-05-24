@@ -4,6 +4,15 @@
 
 const CURRICULUM = {
   python: [
+    { tier: "Advanced Domain Tracks", modules: [
+      { 
+        id: "adv_bigdata", 
+        title: "Big Data Engine (Polars/Dask)", 
+        concepts: ["Lazy evaluation avoids loading entire datasets into RAM", "Chunking processes large CSV/Parquet files sequentially", "Memory-efficient data types"], 
+        desc: "Memory-efficient data processing", 
+        lesson: "<h3>Overview</h3><p>When working with full-state CoreLogic parcel data, <code>pandas</code> will often crash your system. This module introduces <strong>Lazy Evaluation</strong> using <code>polars</code>.</p><h3>Key Concepts</h3><ul><li><strong>Lazy Evaluation:</strong> Polars optimizes your query plan before executing, preventing unnecessary memory allocation.</li><li><strong>Chunking:</strong> Processing data in batches is essential for datasets exceeding local RAM.</li></ul>" 
+      }
+    ]},
     { tier: "Foundations", modules: [
       {
         id: "py_env",
