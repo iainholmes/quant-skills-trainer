@@ -4,15 +4,6 @@
 
 const CURRICULUM = {
   python: [
-    { tier: "Advanced Domain Tracks", modules: [
-      { 
-        id: "adv_bigdata", 
-        title: "Big Data Engine (Polars/Dask)", 
-        concepts: ["Lazy evaluation avoids loading entire datasets into RAM", "Chunking processes large CSV/Parquet files sequentially", "Memory-efficient data types"], 
-        desc: "Memory-efficient data processing", 
-        lesson: "<h3>Overview</h3><p>When working with full-state CoreLogic parcel data, <code>pandas</code> will often crash your system. This module introduces <strong>Lazy Evaluation</strong> using <code>polars</code>.</p><h3>Key Concepts</h3><ul><li><strong>Lazy Evaluation:</strong> Polars optimizes your query plan before executing, preventing unnecessary memory allocation.</li><li><strong>Chunking:</strong> Processing data in batches is essential for datasets exceeding local RAM.</li></ul>" 
-      }
-    ]},
     { tier: "Foundations", modules: [
       {
         id: "py_env",
@@ -882,6 +873,15 @@ ses   = [0.12]*4 + [0.0] + [0.15]*4  # period -1 is reference (se=0)</pre>
     ]},
   ],
 
+    { tier: "Computational Scale", modules: [
+      { id: "py_bigdata",
+        title: "Big Data Engine (Polars/Dask)",
+        desc: "Memory-efficient data processing",
+        concepts: ["Lazy evaluation avoids loading entire datasets into RAM","Chunking processes large CSV/Parquet files sequentially","Memory-efficient data types reduce footprint without precision loss"],
+        lesson: `<h3>Overview</h3><p>When working with large datasets that exceed local RAM, <code>pandas</code> will often crash or slow to a crawl. This module introduces <strong>Lazy Evaluation</strong> using <code>polars</code> and out-of-core processing with <code>dask</code>.</p><h3>Key Concepts</h3><ul><li><strong>Lazy Evaluation:</strong> Polars optimizes your query plan before executing, preventing unnecessary memory allocation.</li><li><strong>Chunking:</strong> Processing data in batches is essential for datasets exceeding local RAM.</li><li><strong>Memory-efficient data types:</strong> Downcasting numeric columns (e.g. float64 to float32) can halve memory usage with no loss of precision for most applications.</li></ul><h3>When to use this</h3><p>Use Polars or Dask when your dataset exceeds ~4GB, you are iterating over many files, or a pandas operation raises a MemoryError.</p>`,
+        exercise: "1. Load a large CSV using polars with lazy evaluation (LazyFrame)\n2. Filter rows and select columns before calling .collect()\n3. Measure peak memory usage using tracemalloc vs a naive pandas load\n4. Repeat the same filter/select with dask and compare syntax"
+      }
+    ]}
   r: [
     { tier: "Foundations", modules: [
       {
@@ -1714,6 +1714,15 @@ m_es <- feols(y ~ treated:i(t, ref=4) | id + t, panel, cluster=~id)</pre>
     ]},
   ],
 
+    { tier: "Computational Scale", modules: [
+      { id: "r_bigdata",
+        title: "Big Data Engine (arrow/dtplyr)",
+        desc: "Memory-efficient data processing in R",
+        concepts: ["Arrow enables out-of-core processing without loading full data into RAM","dtplyr translates dplyr verbs to data.table for speed","Partitioned Parquet files allow column-selective loading"],
+        lesson: `<h3>Overview</h3><p>When working with large datasets that exceed local RAM, base R and standard <code>data.frame</code> workflows break down. This module introduces memory-efficient processing using <code>arrow</code> and <code>dtplyr</code>.</p><h3>Key Concepts</h3><ul><li><strong>Apache Arrow:</strong> Reads Parquet and CSV files lazily — only the columns and rows you request are loaded into memory.</li><li><strong>dtplyr:</strong> Write familiar <code>dplyr</code> syntax that gets translated to fast <code>data.table</code> operations under the hood.</li><li><strong>Partitioned Parquet:</strong> Storing data partitioned by a key variable (e.g. year or region) allows <code>arrow</code> to skip irrelevant partitions entirely.</li></ul><h3>When to use this</h3><p>Use arrow or dtplyr when your dataset exceeds available RAM, you are joining multiple large panel files, or read.csv is consistently slow.</p>`,
+        exercise: "1. Open a large CSV or Parquet file using arrow::open_dataset() without loading it into memory\n2. Filter and select columns using dplyr verbs, then collect() into a data.frame\n3. Compare memory usage vs read.csv using lobstr::mem_used()\n4. Try the same workflow with dtplyr on a data.table"
+      }
+    ]}
   stata: [
     { tier: "Foundations", modules: [
       {
@@ -2461,4 +2470,14 @@ xtset state period</pre>
       },
     ]},
   ],
+    { tier: "Computational Scale", modules: [
+      { id: "stata_bigdata",
+        title: "Big Data Techniques in Stata",
+        desc: "Handling datasets that exceed memory",
+        concepts: ["compress reduces dataset size without data loss","frames allow multiple datasets in memory simultaneously","Selective loading with use ... if avoids full dataset reads"],
+        lesson: `<h3>Overview</h3><p>Stata loads the entire dataset into RAM, which creates constraints when working with large administrative or spatial datasets. This module covers techniques to work efficiently within Stata's memory model.</p><h3>Key Concepts</h3><ul><li><strong>compress:</strong> Automatically downcasts variable storage types, often reducing dataset size by 30-60% with no information loss.</li><li><strong>frames:</strong> Stata 16+ frames allow multiple datasets in memory simultaneously, replacing the older preserve/restore pattern for multi-file workflows.</li><li><strong>use ... if / use ... in:</strong> Load only the rows you need. Combined with keep and drop, this is the primary way to work with datasets larger than RAM.</li></ul><h3>When to use this</h3><p>Apply these techniques when your dataset hits Stata's obs limit, merge operations slow significantly, or you are iterating across many files such as annual survey waves.</p>`,
+        exercise: "1. Load a dataset and run compress — report how much storage was saved\n2. Use 'use varlist using filename' to load only selected variables\n3. Create two frames, load separate datasets into each, and link them with frlink\n4. Use a loop with frames to process multiple files without repeatedly loading/saving"
+      }
+    ]}
+
 };
