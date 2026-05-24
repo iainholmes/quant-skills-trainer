@@ -779,7 +779,10 @@ function openModule(modId) {
   document.getElementById('learn-out').innerHTML    = mod.lesson;
   generateKeyConcepts(mod);
   // focus-warning is managed by the boot URL handler, not cleared on module open
-  document.getElementById('exercise-out').innerHTML = mod.exercise;
+  const exerciseHtml = mod.exercise
+      ? '<ol>' + mod.exercise.split('\\n').map(s => s.replace(/^\d+\.\s*/,'')).map(s => `<li>${s}</li>`).join('') + '</ol>'
+      : '';
+    document.getElementById('exercise-out').innerHTML = exerciseHtml;
   // Personalise exercise if Advisor session exists and API key is set
   personaliseExercise(mod);
   const fb = document.getElementById('feedback-out');
