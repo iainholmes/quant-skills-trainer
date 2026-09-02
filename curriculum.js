@@ -529,7 +529,7 @@ state_fe = np.repeat(np.random.normal(0, 2, states), years)
 
 df = pd.DataFrame({
     "state": state_id, "year": year_id,
-    "min_wage":  5.0 + np.random.uniform(0, 7, N),
+    "min_wage":  5.0 + 0.3*state_fe + np.random.uniform(0, 7, N),
     "state_fe":  state_fe,
 })
 df["teen_emp"] = (30 - 0.8*df["min_wage"] + df["state_fe"]
@@ -774,7 +774,7 @@ np.random.seed(44)
 
 n, p = 800, 30
 X = np.random.normal(0, 1, (n, p))
-beta_x = np.random.normal(0, 0.3, p)
+beta_x = np.random.normal(0, 0.08, p)
 # Treatment: training (binary, endogenous)
 d_star = X @ beta_x + np.random.normal(0, 1, n)
 d = (d_star > 0).astype(float)
@@ -1394,7 +1394,7 @@ firm_fe  <- rep(rnorm(firms, 0, 3), each=years)
 
 df <- data.frame(
   firm=firm_id, year=year_id, state=state_id,
-  tax_rate = 5 + rnorm(N, 0, 2),
+  tax_rate = 5 + 0.2*firm_fe + rnorm(N, 0, 2),
   firm_fe  = firm_fe
 )
 df$investment <- 20 - 0.8*df$tax_rate + df$firm_fe + rnorm(N, 0, 2)</pre>
@@ -1483,6 +1483,7 @@ set.seed(42)
 
 N <- 100; T <- 8
 panel <- expand.grid(id=1:N, t=1:T)
+panel <- panel[order(panel$id, panel$t), ]
 panel$treated <- as.integer(panel$id > 50)
 panel$post    <- as.integer(panel$t > 4)
 panel$fe_i    <- rep(rnorm(N), each=T)
@@ -1997,7 +1998,6 @@ if \`run_checks' {
         exercise: `<h3>Exercise — Macros and loops</h3>
 <p><strong>Scenario:</strong> Run a systematic robustness check estimating a wage regression across four industry groups and three specification levels.</p>
 <pre>clear all; set seed 99; set obs 1200
-gen wage     = exp(rnormal(3.1, 0.45))
 gen educ     = round(8 + runiform()*12)
 gen exper    = round(runiform()*42)
 gen female   = rbinomial(1, 0.5)
@@ -2005,7 +2005,7 @@ gen union    = rbinomial(1, 0.15)
 gen industry = ceil(runiform()*4)
 label define ind 1 "Mfg" 2 "Services" 3 "Govt" 4 "Retail"
 label values industry ind
-gen lwage = log(wage)</pre>
+gen lwage = 0.8 + 0.10*educ + 0.02*exper + 0.10*union - 0.15*female + rnormal(0, 0.4)</pre>
 <ul>
 <li><strong>1.</strong> Define three local macros: <code>spec1 = "educ exper"</code>, <code>spec2 = "educ exper female"</code>, <code>spec3 = "educ exper female union"</code>.</li>
 <li><strong>2.</strong> Use <code>forvalues</code> to loop over industries 1–4. Within each, run OLS of <code>lwage</code> on spec3 with robust SEs and display the industry label and education coefficient.</li>
