@@ -859,9 +859,10 @@ plt.tight_layout(); plt.savefig("coef_plot.pdf", bbox_inches="tight")</pre>
 np.random.seed(60)
 periods = list(range(-4, 5))   # -4 to +4, treatment at 0
 # Simulate event study coefficients (pre-trends ~0, post effects grow)
-coefs = [np.random.normal(0, 0.1) if t < 0
-         else np.random.normal(1.2*t, 0.15) for t in periods]
-ses   = [0.12]*4 + [0.0] + [0.15]*4  # period -1 is reference (se=0)</pre>
+coefs = [0.0 if t == -1 else
+         (np.random.normal(0, 0.1) if t < 0
+          else np.random.normal(1.2*t, 0.15)) for t in periods]
+ses   = [0.12]*3 + [0.0] + [0.15]*5  # period -1 is reference (se=0)</pre>
 <ul>
 <li><strong>1.</strong> Plot the event study: time period on x-axis, coefficient on y-axis, with 95% CI bands. Mark period 0 with a vertical dashed line. Reference period (-1) should be at 0 with no CI bar.</li>
 <li><strong>2.</strong> Add a horizontal reference line at 0. Use a clean, professional style with labeled axes and a title.</li>
@@ -1023,7 +1024,7 @@ set.seed(9)
 n <- 600
 emp_df <- tibble(
   state  = rep(state.abb[1:15], each=40),
-  year   = rep(2010:2023, times=15) |> sample(n, replace=FALSE),
+  year   = sample(2010:2023, n, replace = TRUE),
   emp    = rnorm(n, 50, 10),
   unemp  = runif(n, 3, 12),
   policy = rbinom(n, 1, 0.3),
@@ -1609,7 +1610,7 @@ n <- 1000
 X <- matrix(rnorm(n*10), n, 10)
 W <- rbinom(n, 1, 0.5)                      # random treatment
 tau <- 0.5 + 0.8*(X[,1] > 0)               # true HTE
-Y <- 0.5*W*tau + X[,1] + rnorm(n, 0, 0.5)</pre>
+Y <- W*tau + X[,1] + rnorm(n, 0, 0.5)</pre>
 <ul>
 <li><strong>1.</strong> Fit a causal forest: <code>cf <- causal_forest(X, Y, W, num.trees=2000)</code>.</li>
 <li><strong>2.</strong> Extract unit-level treatment effect estimates with <code>predict(cf)$predictions</code>. Plot a histogram.</li>
@@ -1695,6 +1696,7 @@ set.seed(60)
 # Event study data
 N <- 80; T <- 8
 panel <- expand.grid(id=1:N, t=1:T)
+panel <- panel[order(panel$id, panel$t), ]
 panel$treated <- as.integer(panel$id > 40)
 panel$post    <- as.integer(panel$t > 4)
 panel$fe_i    <- rep(rnorm(N), each=T)
@@ -1824,7 +1826,7 @@ gen year        = 2018 + ceil(runiform()*4)
 replace unemp_rate = . if runiform() < 0.075</pre>
 <ul>
 <li><strong>1.</strong> Run <code>describe</code> and <code>codebook</code> on all variables. How many missing values does <code>unemp_rate</code> have?</li>
-<li><strong>2.</strong> Run <code>summarize, detail</code> on <code>wage</code> and <code>med_income</code>. Note any suspicious values.</li>
+<li><strong>2.</strong> Run <code>summarize, detail</code> on <code>med_income</code>. Note any suspicious values.</li>
 <li><strong>3.</strong> Tabulate <code>state</code> and <code>year</code> with the <code>missing</code> option.</li>
 <li><strong>4.</strong> Find the county with the highest <code>pop_density</code>. What are its <code>state</code> and <code>unemp_rate</code> values?</li>
 </ul>
