@@ -922,6 +922,8 @@ function renderSidebar() {
     });
   }
 
+  const tierPairs = [];
+
   tiers.forEach((tier, tidx) => {
     const isActiveTier = tier.tier === activeTier;
 
@@ -929,21 +931,30 @@ function renderSidebar() {
     const h = document.createElement('div');
     h.className = 'tier-head' + (isActiveTier ? '' : ' collapsed');
     h.textContent = tier.tier;
-    h.onclick = () => {
-      h.classList.toggle('collapsed');
-      mods.classList.toggle('collapsed');
-      if (!mods.classList.contains('collapsed')) {
-        mods.style.maxHeight = mods.scrollHeight + 'px';
-      } else {
-        mods.style.maxHeight = '0';
-      }
-    };
     list.appendChild(h);
 
     // Module container
     const mods = document.createElement('div');
     mods.className = 'tier-modules' + (isActiveTier ? '' : ' collapsed');
     mods.style.maxHeight = isActiveTier ? '2000px' : '0';
+
+    h.onclick = () => {
+      const wasCollapsed = h.classList.contains('collapsed');
+      // Accordion: close every tier first
+      tierPairs.forEach(({header, modsEl}) => {
+        header.classList.add('collapsed');
+        modsEl.classList.add('collapsed');
+        modsEl.style.maxHeight = '0';
+      });
+      // Then reopen only the clicked one, and only if it was closed
+      // (clicking an already-open tier just closes it, matching standard accordion behavior)
+      if (wasCollapsed) {
+        h.classList.remove('collapsed');
+        mods.classList.remove('collapsed');
+        mods.style.maxHeight = mods.scrollHeight + 'px';
+      }
+    };
+    tierPairs.push({header: h, modsEl: mods});
 
     tier.modules.forEach(mod => {
       const isDone=!!progress[mod.id], isActive=currentMod&&currentMod.moduleId===mod.id;
