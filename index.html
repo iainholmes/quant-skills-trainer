@@ -29,13 +29,15 @@
   --stata:#7fb8de; --stata-light:#1a2d3d; --stata-border:#3d5c74;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.65;display:flex;justify-content:center;}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.65;display:flex;flex-direction:column;}
 
-.app-wrapper{width:100%;max-width:1200px;background:var(--surface);min-height:100vh;display:flex;flex-direction:column;}
+.app-wrapper{width:100%;max-width:1200px;margin:0 auto;background:var(--surface);flex:1;display:flex;flex-direction:column;}
 
 /* Header */
-header{background:var(--surface);border-bottom:1px solid var(--border);height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;position:sticky;top:0;z-index:100;}
-.logo{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:0.06em;display:flex;align-items:center;gap:8px;text-transform:uppercase;}
+header{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.header-inner{max-width:1200px;margin:0 auto;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;}
+.logo{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:0.06em;display:flex;align-items:center;gap:8px;text-transform:uppercase;cursor:pointer;transition:color 0.14s;}
+.logo:hover{color:var(--lang);}
 .logo-pip{width:8px;height:8px;border-radius:50%;background:var(--py);transition:background 0.3s;}
 .header-right{display:flex;align-items:center;gap:10px;}
 .api-badge{font-family:var(--mono);font-size:11px;letter-spacing:0.05em;padding:4px 12px;border-radius:20px;border:1px solid var(--border2);color:var(--text3);display:flex;align-items:center;gap:6px;text-transform:uppercase;}
@@ -247,9 +249,22 @@ header{background:var(--surface);border-bottom:1px solid var(--border);height:60
 /* Main */
 .main{padding:2.5rem 3rem;max-width:860px;margin:0 auto;width:100%;}
 .welcome{display:block;}
-.welcome-title{font-family:var(--mono);font-size:26px;font-weight:400;margin-bottom:12px;letter-spacing:-0.01em;}
+.welcome-title{font-family:var(--sans);font-size:34px;font-weight:700;margin-bottom:8px;letter-spacing:-0.01em;line-height:1.15;}
 .welcome-title span{color:var(--lang);transition:color 0.3s;}
 .welcome-sub{font-size:16px;color:var(--text2);margin-bottom:2.5rem;max-width:540px;line-height:1.6;}
+.welcome-hero{margin:-2.5rem -3rem 2.5rem;padding:2.5rem 3rem 0.5rem;background:
+    radial-gradient(ellipse 700px 300px at 15% -10%, rgba(95,184,100,0.06), transparent),
+    radial-gradient(ellipse 700px 300px at 85% -10%, rgba(127,184,222,0.06), transparent),
+    var(--surface);
+  border-bottom:3px solid transparent;
+  border-image:linear-gradient(90deg,#5fb864,#7b98e8,#7fb8de) 1;
+}
+[data-theme="dark"] .welcome-hero{background:
+    radial-gradient(ellipse 700px 300px at 15% -10%, rgba(95,184,100,0.10), transparent),
+    radial-gradient(ellipse 700px 300px at 85% -10%, rgba(127,184,222,0.10), transparent),
+    var(--surface);
+}
+.welcome-brand{font-family:var(--sans);font-size:19px;font-weight:700;letter-spacing:0.01em;color:var(--text);margin-bottom:16px;}
 .welcome-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:2.5rem;}
 .lang-card{padding:1.5rem;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;transition:border-color 0.16s;}
 .lang-card:hover{border-color:var(--border2);}
@@ -261,6 +276,18 @@ header{background:var(--surface);border-bottom:1px solid var(--border);height:60
 .lang-card-r     .lang-card-label{color:var(--r);}
 .lang-card-stata .lang-card-label{color:var(--stata);}
 .lang-card-count{font-size:13px;color:var(--text3);font-family:var(--mono);}
+.sphere-wrap{display:flex;justify-content:center;margin-bottom:1rem;}
+.sphere-svg{width:100%;max-width:420px;height:auto;}
+.sphere-cluster{transform-box:fill-box;transform-origin:center;}
+.sphere-cluster.spin{animation:sphereOrbit 650ms cubic-bezier(.45,.05,.3,1);}
+@keyframes sphereOrbit{
+  0%{transform:rotate(0deg);}
+  100%{transform:rotate(360deg);}
+}
+.sphere-node{transform-box:fill-box;transform-origin:center;transition:transform 500ms cubic-bezier(.34,1.4,.64,1);}
+.sphere-node.active{transform:translateY(-14px);}
+.sphere-node circle.sphere-fill{transition:fill 400ms ease;}
+.sphere-node text{font-family:var(--sans);font-weight:700;transition:fill 400ms ease;pointer-events:none;}
 .welcome-steps{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem 2rem;}
 .welcome-steps h3{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);margin-bottom:16px;}
 .step-row{display:flex;gap:14px;align-items:flex-start;margin-bottom:12px;font-size:15px;color:var(--text2);}
@@ -350,7 +377,8 @@ header{background:var(--surface);border-bottom:1px solid var(--border);height:60
 .ai-box .err-detail{display:block;color:var(--text3);margin-top:6px;font-size:12px;}
 
 /* Footer */
-footer{border-top:1px solid var(--border);padding:16px 3rem;font-family:var(--mono);font-size:11px;color:var(--text3);display:flex;justify-content:space-between;align-items:center;letter-spacing:0.03em;}
+footer{border-top:1px solid var(--border);}
+.footer-inner{max-width:1200px;margin:0 auto;padding:16px 3rem;font-family:var(--mono);font-size:11px;color:var(--text3);display:flex;justify-content:space-between;align-items:center;letter-spacing:0.03em;}
 footer a{color:var(--text3);text-decoration:none;}
 footer a:hover{color:var(--text2);}
 
@@ -390,16 +418,18 @@ footer a:hover{color:var(--text2);}
 </head>
 <body>
 
-<div class="app-wrapper">
-
 <header>
-  <div class="logo"><div class="logo-pip" id="logo-pip"></div>Quant Skills Trainer</div>
-  <div class="header-right">
-    <div class="api-badge" id="api-badge"><div class="dot"></div><span id="api-label">No key</span></div>
-    <button class="btn-sm" id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">🌙</button>
-    <button class="btn-sm" onclick="openModal()">Set API key</button>
+  <div class="header-inner">
+    <div class="logo" onclick="goBack()" role="button" aria-label="Go to home screen"><div class="logo-pip" id="logo-pip"></div>Quant Skills Trainer</div>
+    <div class="header-right">
+      <div class="api-badge" id="api-badge"><div class="dot"></div><span id="api-label">No key</span></div>
+      <button class="btn-sm" id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">🌙</button>
+      <button class="btn-sm" onclick="openModal()">Set API key</button>
+    </div>
   </div>
 </header>
+
+<div class="app-wrapper">
 
 <!-- API Key Modal -->
 <div class="overlay hidden" id="modal-overlay">
@@ -516,17 +546,64 @@ footer a:hover{color:var(--text2);}
     <div class="module-list" id="module-list"></div>
   </aside>
 
-  <div class="main-col" style="display:flex;flex-direction:column;min-height:calc(100vh - 60px);">
+  <div class="main-col" style="display:flex;flex-direction:column;">
   <main class="main" style="flex:1;">
 
     <!-- Welcome -->
     <div class="welcome" id="welcome">
-      <div class="welcome-title">Build your <span id="wt-lang">quant</span> foundation.</div>
-      <div class="welcome-sub">A structured curriculum for econometric modeling in Python, R, and Stata — from clean data to causal inference.</div>
-      <div class="welcome-cards">
-        <div class="lang-card lang-card-py"    onclick="switchLang('python')"><div class="lang-card-label">Python</div><div class="lang-card-count" id="wc-py">— modules</div></div>
-        <div class="lang-card lang-card-r"     onclick="switchLang('r')"     ><div class="lang-card-label">R</div>     <div class="lang-card-count" id="wc-r">— modules</div></div>
-        <div class="lang-card lang-card-stata" onclick="switchLang('stata')" ><div class="lang-card-label">Stata</div> <div class="lang-card-count" id="wc-stata">— modules</div></div>
+      <div class="welcome-hero">
+        <div class="welcome-brand">Quant Skills Trainer</div>
+        <div class="welcome-title">Build your <span id="wt-lang">quant</span> foundation.</div>
+        <div class="welcome-sub">Econometrics practice in Python, R, and Stata.</div>
+        <div class="welcome-cards">
+          <div class="lang-card lang-card-py"    onclick="switchLang('python')"><div class="lang-card-label">Python</div><div class="lang-card-count" id="wc-py">— modules</div></div>
+          <div class="lang-card lang-card-r"     onclick="switchLang('r')"     ><div class="lang-card-label">R</div>     <div class="lang-card-count" id="wc-r">— modules</div></div>
+          <div class="lang-card lang-card-stata" onclick="switchLang('stata')" ><div class="lang-card-label">Stata</div> <div class="lang-card-count" id="wc-stata">— modules</div></div>
+        </div>
+        <div class="sphere-wrap">
+          <svg class="sphere-svg" viewBox="0 0 560 260">
+            <defs>
+              <radialGradient id="grad-py" cx="35%" cy="28%" r="75%">
+                <stop offset="0%" stop-color="#9ee6a3"/><stop offset="55%" stop-color="#5fb864"/><stop offset="100%" stop-color="#357a3a"/>
+              </radialGradient>
+              <radialGradient id="grad-r" cx="35%" cy="28%" r="75%">
+                <stop offset="0%" stop-color="#b7c8f5"/><stop offset="55%" stop-color="#7b98e8"/><stop offset="100%" stop-color="#41539c"/>
+              </radialGradient>
+              <radialGradient id="grad-stata" cx="35%" cy="28%" r="75%">
+                <stop offset="0%" stop-color="#c3e6f5"/><stop offset="55%" stop-color="#7fb8de"/><stop offset="100%" stop-color="#3f6f8c"/>
+              </radialGradient>
+              <radialGradient id="grad-idle" cx="35%" cy="28%" r="75%">
+                <stop offset="0%" stop-color="#5c5744"/><stop offset="100%" stop-color="#302c20"/>
+              </radialGradient>
+              <filter id="sphereShadow" x="-60%" y="-60%" width="220%" height="220%">
+                <feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="#000" flood-opacity="0.35"/>
+              </filter>
+              <linearGradient id="rope-grad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#5fb864" stop-opacity="0.5"/><stop offset="100%" stop-color="#4d4735" stop-opacity="0.5"/>
+              </linearGradient>
+            </defs>
+            <g class="sphere-cluster" id="sphere-cluster">
+              <path d="M 160 130 Q 300 70 430 75" fill="none" stroke="url(#rope-grad)" stroke-width="2.5"/>
+              <path d="M 160 130 Q 300 190 430 195" fill="none" stroke="url(#rope-grad)" stroke-width="2.5"/>
+
+              <g class="sphere-node" data-lang="python">
+                <circle class="sphere-fill" cx="155" cy="120" r="60" fill="url(#grad-idle)" filter="url(#sphereShadow)"/>
+                <ellipse cx="132" cy="99" rx="17" ry="11" fill="rgba(255,255,255,0.4)" style="pointer-events:none;"/>
+                <text x="155" y="132" text-anchor="middle" font-size="30" fill="#9a9484">Py</text>
+              </g>
+              <g class="sphere-node" data-lang="r">
+                <circle class="sphere-fill" cx="440" cy="75" r="48" fill="url(#grad-idle)" filter="url(#sphereShadow)"/>
+                <ellipse cx="423" cy="59" rx="13" ry="9" fill="rgba(255,255,255,0.35)" style="pointer-events:none;"/>
+                <text x="440" y="89" text-anchor="middle" font-size="30" fill="#9a9484">R</text>
+              </g>
+              <g class="sphere-node" data-lang="stata">
+                <circle class="sphere-fill" cx="440" cy="195" r="48" fill="url(#grad-idle)" filter="url(#sphereShadow)"/>
+                <ellipse cx="423" cy="179" rx="13" ry="9" fill="rgba(255,255,255,0.35)" style="pointer-events:none;"/>
+                <text x="440" y="202" text-anchor="middle" font-size="21" fill="#9a9484">Stata</text>
+              </g>
+            </g>
+          </svg>
+        </div>
       </div>
       <div class="welcome-steps">
         <h3>How it works</h3>
@@ -600,14 +677,17 @@ footer a:hover{color:var(--text2);}
     </div>
 
   </main>
-  <footer>
-    <span>Quant Skills Trainer — built for econometrics practice</span>
-    <span><a href="https://iainholmes.github.io" target="_blank">iainholmes.github.io</a></span>
-  </footer>
   </div>
 </div>
 
 </div><!-- /.app-wrapper -->
+
+<footer>
+  <div class="footer-inner">
+    <span>Quant Skills Trainer — built for econometrics practice</span>
+    <span><a href="https://iainholmes.github.io" target="_blank">iainholmes.github.io</a></span>
+  </div>
+</footer>
 
 <script src="curriculum.js"></script>
 <script>
@@ -689,6 +769,7 @@ function boot() {
   });
 
   applyLang(currentLang);
+  updateSphereState(currentLang);
   renderSidebar();
 
   document.getElementById('code-input').addEventListener('keydown', e => {
@@ -697,6 +778,36 @@ function boot() {
 }
 
 // ── Language ──────────────────────────────────────────────────────────────────
+// ── Welcome sphere picker ────────────────────────────────────────────────────
+const SPHERE_STYLE = {
+  python: {grad: 'url(#grad-py)',    text: '#16321a'},
+  r:      {grad: 'url(#grad-r)',     text: '#141c3e'},
+  stata:  {grad: 'url(#grad-stata)', text: '#153042'},
+};
+function updateSphereState(lang) {
+  document.querySelectorAll('.sphere-node').forEach(node => {
+    const isActive = node.dataset.lang === lang;
+    const circle = node.querySelector('circle.sphere-fill');
+    const text = node.querySelector('text');
+    node.classList.toggle('active', isActive);
+    if (isActive) {
+      const s = SPHERE_STYLE[lang] || SPHERE_STYLE.python;
+      circle.setAttribute('fill', s.grad);
+      text.setAttribute('fill', s.text);
+    } else {
+      circle.setAttribute('fill', 'url(#grad-idle)');
+      text.setAttribute('fill', '#9a9484');
+    }
+  });
+}
+function spinSpheres() {
+  const cluster = document.getElementById('sphere-cluster');
+  if (!cluster) return;
+  cluster.classList.remove('spin');
+  void cluster.offsetWidth; // force reflow so the animation reliably restarts
+  cluster.classList.add('spin');
+}
+
 function switchLang(lang) {
   // Try to stay on equivalent module in new language
   var prevModId = currentMod ? currentMod.moduleId : null;
@@ -709,6 +820,9 @@ function switchLang(lang) {
   // won't re-run while the cover is already open — so update it here directly.
   const cover = document.getElementById('sidebar-cover');
   if (cover) cover.style.background = COVER_COLORS[lang] || COVER_COLORS.python;
+
+  spinSpheres();
+  updateSphereState(lang);
 
   if (prevModId) {
     // Map prefix: r_ → py_ → st_ and glm_bridge stays the same
