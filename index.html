@@ -284,10 +284,10 @@ header{background:var(--surface);border-bottom:1px solid var(--border);position:
   0%{transform:rotate(0deg);}
   100%{transform:rotate(360deg);}
 }
-.sphere-node{transform-box:fill-box;transform-origin:center;transition:transform 500ms cubic-bezier(.34,1.4,.64,1);}
-.sphere-node.active{transform:translateY(-14px);}
-.sphere-node circle.sphere-fill{transition:fill 400ms ease;}
-.sphere-node text{font-family:var(--sans);font-weight:700;transition:fill 400ms ease;pointer-events:none;}
+.sphere-node{transform-box:fill-box;transform-origin:center;}
+.sphere-node circle.sphere-fill{transition:fill 400ms ease, cx 450ms cubic-bezier(.34,1.2,.64,1), cy 450ms cubic-bezier(.34,1.2,.64,1), r 450ms cubic-bezier(.34,1.2,.64,1);}
+.sphere-node ellipse.sphere-highlight{transition:cx 450ms ease, cy 450ms ease, rx 450ms ease, ry 450ms ease;}
+.sphere-node text{font-family:var(--sans);font-weight:700;transition:fill 400ms ease, x 450ms ease, y 450ms ease, font-size 450ms ease;pointer-events:none;}
 .welcome-steps{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem 2rem;}
 .welcome-steps h3{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--text3);margin-bottom:16px;}
 .step-row{display:flex;gap:14px;align-items:flex-start;margin-bottom:12px;font-size:15px;color:var(--text2);}
@@ -586,20 +586,20 @@ footer a:hover{color:var(--text2);}
               <path d="M 160 130 Q 300 70 430 75" fill="none" stroke="url(#rope-grad)" stroke-width="2.5"/>
               <path d="M 160 130 Q 300 190 430 195" fill="none" stroke="url(#rope-grad)" stroke-width="2.5"/>
 
-              <g class="sphere-node" data-lang="python">
+              <g class="sphere-node" data-slot="hub">
                 <circle class="sphere-fill" cx="155" cy="120" r="60" fill="url(#grad-idle)" filter="url(#sphereShadow)"/>
-                <ellipse cx="132" cy="99" rx="17" ry="11" fill="rgba(255,255,255,0.4)" style="pointer-events:none;"/>
-                <text x="155" y="132" text-anchor="middle" font-size="30" fill="#9a9484">Py</text>
+                <ellipse class="sphere-highlight" cx="132" cy="99" rx="17" ry="11" fill="rgba(255,255,255,0.4)" style="pointer-events:none;"/>
+                <text class="sphere-label" x="155" y="130" text-anchor="middle" font-size="26" fill="#9a9484"></text>
               </g>
-              <g class="sphere-node" data-lang="r">
+              <g class="sphere-node" data-slot="top">
                 <circle class="sphere-fill" cx="440" cy="75" r="48" fill="url(#grad-idle)" filter="url(#sphereShadow)"/>
-                <ellipse cx="423" cy="59" rx="13" ry="9" fill="rgba(255,255,255,0.35)" style="pointer-events:none;"/>
-                <text x="440" y="89" text-anchor="middle" font-size="30" fill="#9a9484">R</text>
+                <ellipse class="sphere-highlight" cx="423" cy="59" rx="13" ry="9" fill="rgba(255,255,255,0.35)" style="pointer-events:none;"/>
+                <text class="sphere-label" x="440" y="82" text-anchor="middle" font-size="18" fill="#9a9484"></text>
               </g>
-              <g class="sphere-node" data-lang="stata">
+              <g class="sphere-node" data-slot="bottom">
                 <circle class="sphere-fill" cx="440" cy="195" r="48" fill="url(#grad-idle)" filter="url(#sphereShadow)"/>
-                <ellipse cx="423" cy="179" rx="13" ry="9" fill="rgba(255,255,255,0.35)" style="pointer-events:none;"/>
-                <text x="440" y="202" text-anchor="middle" font-size="21" fill="#9a9484">Stata</text>
+                <ellipse class="sphere-highlight" cx="423" cy="179" rx="13" ry="9" fill="rgba(255,255,255,0.35)" style="pointer-events:none;"/>
+                <text class="sphere-label" x="440" y="202" text-anchor="middle" font-size="18" fill="#9a9484"></text>
               </g>
             </g>
           </svg>
@@ -779,32 +779,57 @@ function boot() {
 
 // ── Language ──────────────────────────────────────────────────────────────────
 // ── Welcome sphere picker ────────────────────────────────────────────────────
+const SPHERE_ORDER = ['python', 'r', 'stata'];
+const SPHERE_LABEL = {python: 'Py', r: 'R', stata: 'Stata'};
 const SPHERE_STYLE = {
   python: {grad: 'url(#grad-py)',    text: '#16321a'},
   r:      {grad: 'url(#grad-r)',     text: '#141c3e'},
   stata:  {grad: 'url(#grad-stata)', text: '#153042'},
 };
+const SLOT_GEOM = {
+  hub:    {cx: 155, cy: 120, r: 60, font: 26},
+  top:    {cx: 440, cy: 75,  r: 48, font: 18},
+  bottom: {cx: 440, cy: 195, r: 48, font: 18},
+};
+
 function updateSphereState(lang) {
-  document.querySelectorAll('.sphere-node').forEach(node => {
-    const isActive = node.dataset.lang === lang;
-    const circle = node.querySelector('circle.sphere-fill');
-    const text = node.querySelector('text');
-    node.classList.toggle('active', isActive);
-    if (isActive) {
-      const s = SPHERE_STYLE[lang] || SPHERE_STYLE.python;
-      circle.setAttribute('fill', s.grad);
-      text.setAttribute('fill', s.text);
-    } else {
-      circle.setAttribute('fill', 'url(#grad-idle)');
-      text.setAttribute('fill', '#9a9484');
-    }
+  const others = SPHERE_ORDER.filter(l => l !== lang);
+  const assignment = {hub: lang, top: others[0], bottom: others[1]};
+
+  Object.entries(assignment).forEach(([slot, slotLang]) => {
+    const node = document.querySelector(`.sphere-node[data-slot="${slot}"]`);
+    if (!node || !slotLang) return;
+    const geom = SLOT_GEOM[slot];
+    const circle  = node.querySelector('circle.sphere-fill');
+    const ellipse = node.querySelector('ellipse.sphere-highlight');
+    const text    = node.querySelector('text.sphere-label');
+    const isHub   = slot === 'hub';
+    const style   = SPHERE_STYLE[slotLang] || SPHERE_STYLE.python;
+
+    circle.setAttribute('cx', geom.cx);
+    circle.setAttribute('cy', geom.cy);
+    circle.setAttribute('r', geom.r);
+    circle.setAttribute('fill', isHub ? style.grad : 'url(#grad-idle)');
+
+    ellipse.setAttribute('cx', geom.cx - geom.r * 0.38);
+    ellipse.setAttribute('cy', geom.cy - geom.r * 0.35);
+    ellipse.setAttribute('rx', geom.r * 0.28);
+    ellipse.setAttribute('ry', geom.r * 0.18);
+
+    text.setAttribute('x', geom.cx);
+    text.setAttribute('y', geom.cy + geom.font * 0.36);
+    text.setAttribute('font-size', geom.font);
+    text.setAttribute('fill', isHub ? style.text : '#9a9484');
+    text.textContent = SPHERE_LABEL[slotLang] || '';
+
+    node.dataset.lang = slotLang;
   });
 }
 function spinSpheres() {
   const cluster = document.getElementById('sphere-cluster');
   if (!cluster) return;
   cluster.classList.remove('spin');
-  void cluster.offsetWidth; // force reflow so the animation reliably restarts
+  cluster.getBoundingClientRect(); // force reflow — offsetWidth doesn't exist on SVG elements, this does
   cluster.classList.add('spin');
 }
 
