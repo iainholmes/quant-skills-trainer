@@ -1,9 +1,9 @@
-# IH. House Divider System
+# Quant Skills Trainer — IH. house divider
 
-This application interprets the [house divider reference](https://github.com/iainholmes/iainholmes.github.io/blob/master/desk/HOUSE-DIVIDER-SYSTEM.md) using its own interface colors.
+The canonical reference is [IH. House Divider System](https://github.com/iainholmes/iainholmes.github.io/blob/master/desk/HOUSE-DIVIDER-SYSTEM.md).
 
-Only the existing session-header boundary is refined. A 3px cap tapers to a 1px center; --border2 remains neutral and the compact terminals inherit the selected --lang color. Question, editor, output, feedback and progress elements are unchanged.
+Refine only the existing `.sess-header` rule: a 3px terminal tapers over a six-pixel shoulder to a 1px principal stroke. Keep the neutral `--border2` center and existing selected-language `--lang` terminals. Python, R and Stata retain their native colors in both appearances.
 
-The scoped `ih-house-dividers` style block in `index.html` adds static, noninteractive geometry without changing the reserved border space. Terminal length is clamped. Forced colors use CanvasText; print retains the original ordinary rule. There are no new runtime dependencies, fonts, assets or scripts. Published source and user-data formats remain unchanged.
+At widths of 600px or less, retain the original ordinary border instead. The existing sidebar leaves insufficient space for the ornament in portrait; this deliberate omission avoids crowding and does not alter that existing layout.
 
-Pre-merge validation must use the exact source commit, compare functional/layout behavior with its base and inspect downloaded desktop/mobile screenshots. Temporary validation runs from an isolated branch in the main website repository; it is not part of this application's deployment. Record repository-specific commits, runs and deployment evidence in the PR. User/device acceptance is separate from remote review.
+The added `ih-house-dividers` style block changes no markup, lesson, exercise, editor, feedback, API flow, storage format, progress state or keyboard behavior. Decorative layers intercept no input; forced colors and print retain ordinary rules. Remote desktop/tablet/portrait/landscape comparisons are required before integration. Physical-device acceptance remains with the owner.
